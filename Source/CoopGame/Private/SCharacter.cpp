@@ -6,7 +6,6 @@
 #include "SWeapon.h"
 #include "Components/CapsuleComponent.h"
 #include "CoopGame/CoopGame.h"
-#include "..\Public\SCharacter.h"
 #include "Components/SHealthComponent.h"
 #include "SWeaponPickup.h"
 

@@ -2,7 +2,6 @@
 
 
 #include "SWeapon.h"
-#include "..\Public\SWeapon.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"

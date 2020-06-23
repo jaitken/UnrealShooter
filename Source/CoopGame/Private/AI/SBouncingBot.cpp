@@ -245,6 +245,9 @@ void ASBouncingBot::Tick(float DeltaTime)
 			//keep moving towards target
 			MeshComp->AddForce(ForceDirection, NAME_None, bUseVelocityChange);
 			//DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + ForceDirection, 32, FColor::Red, false, 0.1f, 0, 1.0f);
+			
+			//Play Sound 
+			UGameplayStatics::PlaySoundAtLocation(this, BounceSound, GetActorLocation());
 
 
 			DrawDebugSphere(GetWorld(), NextPathPoint, 20, 12, FColor::Red, false, 0.1f, 1.0f);
