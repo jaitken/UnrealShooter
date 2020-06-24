@@ -16,6 +16,9 @@ class COOPGAME_API ASShotgunWeapon : public ASWeapon
 	
 public:
 
+	virtual void StartReload() override;
+
+	virtual void FinishReload() override;
 
 protected: 
 

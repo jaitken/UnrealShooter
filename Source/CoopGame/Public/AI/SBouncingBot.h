@@ -97,6 +97,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
 	USoundCue* BounceSound;
 
+	void PlaySound();
+
+	void PrepareNextSound();
+
+	FTimerHandle TimerHandle_BounceSound;
+
+	bool bSoundReady;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

@@ -98,6 +98,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Components")
 	ASWeapon* GetCurrentWeapon();
 
+	UFUNCTION(BlueprintCallable, Category = "Components")
+	ASWeapon* GetBackWeapon();
+
 	void SetWeapon(TSubclassOf<ASWeapon> NewWeaponClass);
 
 	UFUNCTION(BlueprintCallable, Category = "Player")
@@ -112,5 +115,11 @@ public:
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 
 	virtual void NotifyActorEndOverlap(AActor* OtherActor) override;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	float ARAmmo;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	float ShotgunAmmo;
 
 };

@@ -43,6 +43,7 @@ void ASGameMode::PrepareForNextWave()
 
 void ASGameMode::StartWave()
 {
+	UE_LOG(LogTemp, Warning, TEXT("STARTWAVE CALLED"));
 	WaveCount++;
 
 	NumOfBotsToSpawn = 2 * WaveCount;
@@ -99,6 +100,7 @@ void ASGameMode::CheckWaveState()
 
 void ASGameMode::CheckAnyPlayerAlive()
 {
+	UE_LOG(LogTemp, Warning, TEXT("CHECKANYPLAYERALIVE CALLED"));
 		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 			{
 				APlayerController* PC = It->Get();
@@ -174,7 +176,7 @@ void ASGameMode::StartPlay()
 	Super::StartPlay();
 
 	//SetWaveState(EWaveState::MainMenu);
-	//PrepareForNextWave();
+	PrepareForNextWave();
 
 }
 

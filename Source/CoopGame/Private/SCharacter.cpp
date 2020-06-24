@@ -36,6 +36,8 @@ ASCharacter::ASCharacter()
 	WeaponAttachSocketName = "WeaponSocket";
 	WeaponBackSocketName = "WeaponBackSocket";
 
+	ARAmmo = 10000;
+	ShotgunAmmo = 5000;
 }
 
 
@@ -240,6 +242,11 @@ FVector ASCharacter::GetPawnViewLocation() const
 ASWeapon * ASCharacter::GetCurrentWeapon()
 {
 	return CurrentWeapon;
+}
+
+ASWeapon * ASCharacter::GetBackWeapon()
+{
+	return BackWeapon;
 }
 
 void ASCharacter::SetWeapon(TSubclassOf<ASWeapon> NewWeaponClass)

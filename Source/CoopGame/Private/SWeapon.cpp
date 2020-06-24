@@ -11,6 +11,7 @@
 #include "CoopGame/CoopGame.h"
 #include "TimerManager.h"
 #include "Sound/SoundCue.h"
+#include "SCharacter.h"
 
 
 static int32 DebugWeaponDrawing = 0;
@@ -35,7 +36,6 @@ ASWeapon::ASWeapon()
 
 	RateOfFire = 600.0f;
 	MagSize = 30;
-	TotalAmmo = 300;
 	ReloadTime = 1.0f;
 
 
@@ -70,10 +70,13 @@ void ASWeapon::Fire()
 			FVector ShotDirection = EyeRotation.Vector();
 
 			//bullet spread
+			
 			float HalfRad = FMath::DegreesToRadians(BulletSpread);
 			ShotDirection  = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
-
+			
+			
 			FVector TraceEnd = EyeLocation + (ShotDirection * 10000);
+			
 
 			//offset Eyelocation so the line trace starts more in line with muzzlelocation
 			EyeLocation = EyeLocation + (ShotDirection * 175);
@@ -181,7 +184,10 @@ void ASWeapon::StartReload()
 		return;
 	}
 	//only reload if player has ammo
-	if (TotalAmmo > 0)
+	AActor* MyOwner = GetOwner();
+	ASCharacter* MyCharacter = Cast<ASCharacter>(MyOwner);
+
+	if (MyCharacter->ARAmmo > 0)
 	{
 		//play sound
 		FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
@@ -199,16 +205,19 @@ void ASWeapon::FinishReload()
 {
 	reloading = false;
 
+	AActor* MyOwner = GetOwner();
+	ASCharacter* MyCharacter = Cast<ASCharacter>(MyOwner);
+
 	float NeededAmmo = MagSize - CurrentAmmo;
-	if (TotalAmmo >= NeededAmmo)
+	if (MyCharacter->ARAmmo >= NeededAmmo)
 	{
 		CurrentAmmo = MagSize;
-		TotalAmmo = TotalAmmo - NeededAmmo;
+		MyCharacter->ARAmmo = MyCharacter->ARAmmo - NeededAmmo;
 	}
 	else
 	{
-		CurrentAmmo = CurrentAmmo + TotalAmmo;
-		TotalAmmo = 0;
+		CurrentAmmo = CurrentAmmo + MyCharacter->ARAmmo;
+		MyCharacter->ARAmmo = 0;
 	}
 	
 	GetWorldTimerManager().ClearTimer(TimerHandle_ReloadTime);

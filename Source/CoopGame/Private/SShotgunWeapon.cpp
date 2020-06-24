@@ -12,7 +12,7 @@
 #include "Net/UnrealNetwork.h"
 #include "DrawDebugHelpers.h"
 #include "Sound/SoundCue.h"
-
+#include "SCharacter.h"
 
 void ASShotgunWeapon::Fire()
 {
@@ -41,14 +41,50 @@ void ASShotgunWeapon::Fire()
 			EyeLocation = EyeLocation + (ShotDirection * 175);
 
 
-			//bullet spread
 			for (int i = 0; i < PelletCount; i++)
 			{
+				//switch statment/offset vector to give a nice even bullet spread
+				FVector offset = FVector(0, 0, 0);
+				switch (i)
+				{
+					default:
+						break;
+					case 0:
+						offset = FVector(0, -100, 100);
+						break;
+					case 1:
+						offset = FVector(0, -50, 120);
+						break;
+					case 2:
+						offset = FVector(0, 50, 120);
+						break;
+					case 3:
+						offset = FVector(0, 100, 100);
+						break;
+					case 4:
+						offset = FVector(0, -50, 50);
+						break;
+					case 5:
+						offset = FVector(0, 50, 50);
+						break;
+					case 6:
+						offset = FVector(0, -100, -100);
+						break;
+					case 7:
+						offset = FVector(0, -50, -120);
+						break;
+					case 8:
+						offset = FVector(0, 50, -120);
+						break;
+					case 9:
+						offset = FVector(0, 100, -100);
+						break;
+					
+				}
+				
 
-				float HalfRad = FMath::DegreesToRadians(BulletSpread);
-				ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
-
-				FVector TraceEnd = EyeLocation + (ShotDirection * 3000);
+				FVector TraceEnd = EyeLocation + (ShotDirection * 4000);
+				TraceEnd = TraceEnd + offset;
 
 				FVector TracerEndPoint = TraceEnd;
 				EPhysicalSurface SurfaceType = SurfaceType_Default;
@@ -103,6 +139,54 @@ void ASShotgunWeapon::Fire()
 		StartReload();
 	}
 }
+
+void ASShotgunWeapon::StartReload()
+{
+	//don't reload if magazine already full
+	if (CurrentAmmo == MagSize)
+	{
+		return;
+	}
+	//only reload if player has ammo
+	AActor* MyOwner = GetOwner();
+	ASCharacter* MyCharacter = Cast<ASCharacter>(MyOwner);
+
+	if (MyCharacter->ShotgunAmmo > 0)
+	{
+		//play sound
+		FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+		UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, MuzzleLocation);
+
+		reloading = true;
+		StopFire();
+		GetWorldTimerManager().SetTimer(TimerHandle_ReloadTime, this, &ASWeapon::FinishReload, ReloadTime, false);
+	}
+
+}
+
+void ASShotgunWeapon::FinishReload()
+{
+	reloading = false;
+
+	AActor* MyOwner = GetOwner();
+	ASCharacter* MyCharacter = Cast<ASCharacter>(MyOwner);
+
+	float NeededAmmo = MagSize - CurrentAmmo;
+	if (MyCharacter->ShotgunAmmo >= NeededAmmo)
+	{
+		CurrentAmmo = MagSize;
+		MyCharacter->ShotgunAmmo = MyCharacter->ShotgunAmmo - NeededAmmo;
+	}
+	else
+	{
+		CurrentAmmo = CurrentAmmo + MyCharacter->ShotgunAmmo;
+		MyCharacter->ShotgunAmmo = 0;
+	}
+
+	GetWorldTimerManager().ClearTimer(TimerHandle_ReloadTime);
+
+}
+
 
 void ASShotgunWeapon::PlayPumpSound()
 {

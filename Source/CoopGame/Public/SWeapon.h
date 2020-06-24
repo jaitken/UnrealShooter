@@ -98,8 +98,14 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void SetBaseDamage(float NewDamage);
 
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
 	USoundCue* ShotSound;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+	USoundCue* DefaultSound;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+	USoundCue* QuadDamageSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	USoundCue* ReloadSound;
@@ -113,9 +119,9 @@ public:
 
 	void StopFire();
 
-	void StartReload();
+	virtual void StartReload();
 
-	void FinishReload();
+	virtual void FinishReload();
 
 	bool reloading;
 

@@ -68,6 +68,7 @@ void ASBouncingBot::BeginPlay()
 		GetWorldTimerManager().SetTimer(TimerHandle_IsTouchingGround, this, &ASBouncingBot::IsTouchingGround, .05f, true);
 	}
 
+	bSoundReady = true;
 
 	
 }
@@ -224,6 +225,21 @@ void ASBouncingBot::IsTouchingGround()
 	
 }
 
+void ASBouncingBot::PlaySound()
+{
+	if (bSoundReady) {
+		UE_LOG(LogTemp, Warning, TEXT("BOUNCE SOUND PLAYED"));
+		UGameplayStatics::PlaySoundAtLocation(this, BounceSound, GetActorLocation());
+		bSoundReady = false;
+		GetWorldTimerManager().SetTimer(TimerHandle_BounceSound, this, &ASBouncingBot::PrepareNextSound, 0.5f, false);
+	}
+}
+
+void ASBouncingBot::PrepareNextSound()
+{
+	bSoundReady = true;
+}
+
 // Called every frame
 void ASBouncingBot::Tick(float DeltaTime)
 {
@@ -247,7 +263,7 @@ void ASBouncingBot::Tick(float DeltaTime)
 			//DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + ForceDirection, 32, FColor::Red, false, 0.1f, 0, 1.0f);
 			
 			//Play Sound 
-			UGameplayStatics::PlaySoundAtLocation(this, BounceSound, GetActorLocation());
+			PlaySound();
 
 
 			DrawDebugSphere(GetWorld(), NextPathPoint, 20, 12, FColor::Red, false, 0.1f, 1.0f);
