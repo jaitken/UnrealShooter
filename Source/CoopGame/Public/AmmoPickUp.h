@@ -42,7 +42,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
 	EAmmoType AmmoType;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
+	float AmmoAmount;
+
 	void AddAmmo(ASCharacter* Player);
+
+
 
 public:	
 	// Called every frame

@@ -36,8 +36,8 @@ ASCharacter::ASCharacter()
 	WeaponAttachSocketName = "WeaponSocket";
 	WeaponBackSocketName = "WeaponBackSocket";
 
-	ARAmmo = 10000;
-	ShotgunAmmo = 5000;
+	ARAmmo = 120;
+	ShotgunAmmo = 10;
 }
 
 
@@ -150,6 +150,8 @@ void ASCharacter::OnHealthChanged(USHealthComponent* OwningHealthComp, float Hea
 
 		CurrentWeapon->StopFire();
 		CurrentWeapon->SetLifeSpan(10.0f);
+
+		SpawnAmmo();
 
 	}
 

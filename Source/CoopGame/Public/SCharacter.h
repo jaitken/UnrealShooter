@@ -84,6 +84,9 @@ protected:
 
 	TSubclassOf<ASWeapon> WeaponPickUpClass;
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Enemy")
+	void SpawnAmmo();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

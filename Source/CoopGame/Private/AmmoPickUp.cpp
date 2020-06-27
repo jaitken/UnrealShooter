@@ -34,12 +34,12 @@ void AAmmoPickUp::AddAmmo(ASCharacter * Player)
 {
 	if (AmmoType == EAmmoType::ARAmmo)
 	{
-		Player->ARAmmo += 50;
+		Player->ARAmmo += AmmoAmount;
 	}
 
 	if (AmmoType == EAmmoType::ShotgunAmmo)
 	{
-		Player->ShotgunAmmo += 10;
+		Player->ShotgunAmmo += AmmoAmount;
 	}
 
 	Destroy();
