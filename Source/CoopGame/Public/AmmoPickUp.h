@@ -16,7 +16,11 @@ enum class EAmmoType : uint8
 {
 	ARAmmo,
 
-	ShotgunAmmo
+	ShotgunAmmo,
+
+	SniperAmmo
+
+
 };
 
 

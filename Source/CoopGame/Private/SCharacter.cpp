@@ -38,6 +38,7 @@ ASCharacter::ASCharacter()
 
 	ARAmmo = 120;
 	ShotgunAmmo = 10;
+	SniperAmmo = 5;
 }
 
 

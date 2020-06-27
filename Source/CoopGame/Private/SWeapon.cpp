@@ -53,7 +53,6 @@ void ASWeapon::BeginPlay()
 void ASWeapon::Fire()
 {
 	
-
 	if (CurrentAmmo > 0)
 	{
 

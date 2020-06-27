@@ -119,10 +119,13 @@ public:
 
 	virtual void NotifyActorEndOverlap(AActor* OtherActor) override;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 	float ARAmmo;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 	float ShotgunAmmo;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
+	float SniperAmmo;
 
 };
