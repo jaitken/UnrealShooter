@@ -42,6 +42,11 @@ void AAmmoPickUp::AddAmmo(ASCharacter * Player)
 		Player->ShotgunAmmo += AmmoAmount;
 	}
 
+	if (AmmoType == EAmmoType::SniperAmmo)
+	{
+		Player->SniperAmmo += AmmoAmount;
+	}
+
 	Destroy();
 }
 

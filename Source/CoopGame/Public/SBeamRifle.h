@@ -23,4 +23,15 @@ public:
 protected:
 
 	virtual void Fire() override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	USoundCue* BetweenShotSound;
+
+	FTimerHandle TimerHandle_TBetweenShots;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	float TBetweenShots;
+
+	void PlayBetweenShotSound();
+
 };

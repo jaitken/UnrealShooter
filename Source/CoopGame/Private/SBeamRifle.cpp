@@ -129,6 +129,7 @@ void ASBeamRifle::Fire()
 			//Play Sound 
 			FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 			UGameplayStatics::PlaySoundAtLocation(this, ShotSound, MuzzleLocation);
+			GetWorldTimerManager().SetTimer(TimerHandle_TBetweenShots, this, &ASBeamRifle::PlayBetweenShotSound, TBetweenShots, false);
 
 
 			//DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Red, false, 3.0f, 0, 1.0f);
@@ -149,4 +150,12 @@ void ASBeamRifle::Fire()
 		StartReload();
 	}
 
+}
+
+void ASBeamRifle::PlayBetweenShotSound()
+{
+	FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+	UGameplayStatics::PlaySoundAtLocation(this, BetweenShotSound, MuzzleLocation);
+
+	GetWorldTimerManager().ClearTimer(TimerHandle_TBetweenShots);
 }

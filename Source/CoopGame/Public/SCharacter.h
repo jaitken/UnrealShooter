@@ -43,8 +43,14 @@ protected:
 
 	bool bWantsToZoom; 
 
-	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	UPROPERTY(EditAnywhere, Category = "Player")
+	float DefZoomedFOV;
+
+	UPROPERTY(EditAnywhere, Category = "Player")
 	float ZoomedFOV;
+
+	UPROPERTY(EditAnywhere, Category = "Player")
+	float SniperFOV;
 
 	float DefaultFOV;
 

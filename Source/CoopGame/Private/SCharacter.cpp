@@ -8,6 +8,7 @@
 #include "CoopGame/CoopGame.h"
 #include "Components/SHealthComponent.h"
 #include "SWeaponPickup.h"
+#include "SBeamRifle.h"
 
 
 // Sets default values
@@ -30,7 +31,9 @@ ASCharacter::ASCharacter()
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp);
 
+	SniperFOV = 40.0f;
 	ZoomedFOV = 65.0f;
+	DefZoomedFOV = 65.0f;
 	ZoomInterpSpeed = 20;
 
 	WeaponAttachSocketName = "WeaponSocket";
@@ -96,6 +99,19 @@ void ASCharacter::EndCrouch()
 void ASCharacter::BeginZoom()
 {
 	bWantsToZoom = true;
+	ASBeamRifle* temp = Cast<ASBeamRifle>(CurrentWeapon);
+	if(temp)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Beam rifle Zoom"));
+		ZoomedFOV = SniperFOV;
+		
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("other Zoom"));
+		ZoomedFOV = DefZoomedFOV;
+
+	}
 }
 
 void ASCharacter::EndZoom()
