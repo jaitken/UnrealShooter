@@ -36,11 +36,15 @@ protected:
 
 	bool bWeaponReady;
 
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditInstanceOnly, Category = "WeaponPickup")
+	UPROPERTY(EditDefaultsOnly, Category = "WeaponPickup")
 	TSubclassOf<ASWeapon> WeaponClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
+	float WeaponPrice;
 
 };

@@ -41,7 +41,7 @@ ASCharacter::ASCharacter()
 
 	ARAmmo = 120;
 	ShotgunAmmo = 10;
-	SniperAmmo = 5;
+	SniperAmmo = 10;
 }
 
 
@@ -168,6 +168,7 @@ void ASCharacter::OnHealthChanged(USHealthComponent* OwningHealthComp, float Hea
 		CurrentWeapon->StopFire();
 		CurrentWeapon->SetLifeSpan(10.0f);
 
+		//enemies drop ammo/cash on death
 		SpawnAmmo();
 
 	}
@@ -197,8 +198,12 @@ void ASCharacter::SwitchWeapon()
 void ASCharacter::PickUpWeapon()
 {
 	if (bPlayerOverWeapon) {
-
-		SetWeapon(WeaponPickUpClass);
+		
+		if (Money > WeaponPickupCost) 
+		{
+			Money = Money - WeaponPickupCost;
+			SetWeapon(WeaponPickUpClass);
+		}
 
 	}
 
@@ -305,6 +310,7 @@ void ASCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
 {
 	ASWeaponPickup* temp = Cast<ASWeaponPickup>(OtherActor);
 	if (temp) {
+		WeaponPickupCost = temp->WeaponPrice;
 		WeaponPickUpClass = temp->WeaponClass;
 		bPlayerOverWeapon = true;
 	}

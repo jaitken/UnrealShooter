@@ -4,6 +4,7 @@
 #include "Components/SHealthComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "SGameMode.h"
+#include "SCharacter.h"
 
 // Sets default values for this component's properties
 USHealthComponent::USHealthComponent()
@@ -75,12 +76,19 @@ void USHealthComponent::HandleTakeAnyDamage(AActor * DamagedActor, float Damage,
 
 	if (Health <= 0.0f)
 	{
+		
+		ASCharacter* Killer = Cast<ASCharacter>(DamageCauser);
+		if (Killer)
+		{
+			Killer->Money = Killer->Money + Value;
+		}
 		//will only happen on server, gamemode only exists on server
 		ASGameMode* GM = Cast<ASGameMode>(GetWorld()->GetAuthGameMode());
 		if (GM)
 		{
 			GM->OnActorKilled.Broadcast(GetOwner(), DamageCauser, InstigatedBy);
 		}
+		
 	}
 	
 }
