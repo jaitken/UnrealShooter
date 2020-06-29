@@ -64,14 +64,19 @@ void ASPickupActor::NotifyActorBeginOverlap(AActor * OtherActor)
 	ASCharacter* tempChar = Cast<ASCharacter>(OtherActor);
 	if (tempChar)
 	{
-		if (PowerupInstance)
+		if (tempChar->bIsPlayer) 
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Powerup Instance activated and destroyed"));
-			PowerupInstance->ActivatePowerup(OtherActor);
-			PowerupInstance = nullptr;
+			
+			if (PowerupInstance)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Powerup Instance activated and destroyed"));
+				PowerupInstance->ActivatePowerup(OtherActor);
+				PowerupInstance = nullptr;
 
-			GetWorldTimerManager().SetTimer(TimerHandle_RespawnTimer, this, &ASPickupActor::Respawn, CooldownDuration);
+				GetWorldTimerManager().SetTimer(TimerHandle_RespawnTimer, this, &ASPickupActor::Respawn, CooldownDuration);
+			}
 		}
+		
 	}
 	
 

@@ -94,6 +94,10 @@ protected:
 	void SpawnAmmo();
 
 public:	
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	bool bIsPlayer;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

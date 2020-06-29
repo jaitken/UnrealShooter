@@ -62,8 +62,11 @@ void AAmmoPickUp::NotifyActorBeginOverlap(AActor * OtherActor)
 	ASCharacter* MyCharacter = Cast<ASCharacter>(OtherActor);
 	if (MyCharacter)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Ammo Picked up"))
-		AddAmmo(MyCharacter);
+		if (MyCharacter->bIsPlayer) {
+			UE_LOG(LogTemp, Warning, TEXT("Ammo Picked up"))
+				AddAmmo(MyCharacter);
+		}
+	
 	}
 }
 
