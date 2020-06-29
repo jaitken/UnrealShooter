@@ -9,6 +9,7 @@
 #include "Components/SHealthComponent.h"
 #include "SWeaponPickup.h"
 #include "SBeamRifle.h"
+#include "SWall.h"
 
 
 // Sets default values
@@ -199,7 +200,7 @@ void ASCharacter::PickUpWeapon()
 {
 	if (bPlayerOverWeapon) {
 		
-		if (Money > WeaponPickupCost) 
+		if (Money >= WeaponPickupCost) 
 		{
 			Money = Money - WeaponPickupCost;
 			SetWeapon(WeaponPickUpClass);
@@ -207,6 +208,27 @@ void ASCharacter::PickUpWeapon()
 
 	}
 
+}
+
+void ASCharacter::BuyDoor()
+{
+	UE_LOG(LogTemp, Warning, TEXT("BUY Door Attempted"))
+	if (bPlayerNearDoor)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Door Destoryed"))
+
+			if (Money >= DoorCost) 
+			{
+				Money = Money - DoorCost;
+				DoorToOpen->Open();
+			}
+	}
+
+}
+
+void ASCharacter::AddMoney()
+{
+	Money = Money + 100;
 }
 
 // Called every frame
@@ -249,6 +271,11 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	PlayerInputComponent->BindAction("SwitchWeapon", IE_Pressed, this, &ASCharacter::SwitchWeapon);
 	PlayerInputComponent->BindAction("PickUpWeapon", IE_Pressed, this, &ASCharacter::PickUpWeapon);
+
+	PlayerInputComponent->BindAction("BuyDoor", IE_Pressed, this, &ASCharacter::BuyDoor);
+
+	//for testing money
+	PlayerInputComponent->BindAction("AddMoney", IE_Pressed, this, &ASCharacter::AddMoney);
 
 
 }
@@ -308,19 +335,40 @@ void ASCharacter::SetWeapon(TSubclassOf<ASWeapon> NewWeaponClass)
 
 void ASCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
 {
+	//for weapon pickups
 	ASWeaponPickup* temp = Cast<ASWeaponPickup>(OtherActor);
 	if (temp) {
 		WeaponPickupCost = temp->WeaponPrice;
 		WeaponPickUpClass = temp->WeaponClass;
 		bPlayerOverWeapon = true;
 	}
+
+	//for opening doors
+	ASWall* Wall = Cast<ASWall>(OtherActor);
+	if(Wall)
+	{
+		bPlayerNearDoor = true;
+		DoorCost = Wall->PriceToOpen;
+		DoorToOpen = Wall;
+
+	}
+
 }
 
 void ASCharacter::NotifyActorEndOverlap(AActor * OtherActor)
 {
+	//for weapon pickups
 	ASWeaponPickup* temp = Cast<ASWeaponPickup>(OtherActor);
 	if (temp) {
 		bPlayerOverWeapon = false;
+	}
+
+	//for doors
+	ASWall* Wall = Cast<ASWall>(OtherActor);
+	if (Wall)
+	{
+		bPlayerNearDoor = false;
+
 	}
 
 }

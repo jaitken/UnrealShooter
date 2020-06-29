@@ -10,6 +10,7 @@ class USHealthComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class ASWeapon;
+class ASWall;
 
 UCLASS()
 class COOPGAME_API ASCharacter : public ACharacter
@@ -92,6 +93,19 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Enemy")
 	void SpawnAmmo();
+
+
+	//Doors
+	void BuyDoor();
+
+	bool bPlayerNearDoor;
+
+	float DoorCost;
+
+	ASWall* DoorToOpen;
+
+	//add money to character for testing
+	void AddMoney();
 
 public:	
 
