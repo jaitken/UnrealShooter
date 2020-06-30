@@ -34,5 +34,7 @@ void ASWall::Tick(float DeltaTime)
 
 void ASWall::Open()
 {
+	SpawnPoint1->Tags.Add(FName("ActiveSpawn"));
+	SpawnPoint2->Tags.Add(FName("ActiveSpawn"));
 	Destroy();
 }

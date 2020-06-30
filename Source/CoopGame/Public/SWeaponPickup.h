@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "AmmoPickup.h"
 #include "SWeaponPickup.generated.h"
 
 class ASWeapon;
@@ -46,5 +47,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	float WeaponPrice;
+
+	UPROPERTY(EditDefaultsOnly, Category = "WeaponPickup")
+	EAmmoType AmmoType;
 
 };

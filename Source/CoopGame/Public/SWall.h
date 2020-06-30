@@ -29,7 +29,17 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Components")
 	UBoxComponent* BoxComp;
 
-public:	
+public:
+
+	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
+	AActor* SpawnPoint1;
+
+	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
+	AActor* SpawnPoint2;
+
+	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
+	AActor* SpawnPoint3;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "AmmoPickup.h"
 #include "SCharacter.generated.h"
 
 class USHealthComponent;
@@ -156,5 +157,9 @@ public:
 	float Money;
 
 	float WeaponPickupCost;
+
+	float AmmoToAdd;
+
+	EAmmoType AmmoTypeToAdd;
 
 };

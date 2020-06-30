@@ -10,6 +10,7 @@
 #include "SWeaponPickup.h"
 #include "SBeamRifle.h"
 #include "SWall.h"
+#include "AmmoPickup.h"
 
 
 // Sets default values
@@ -40,7 +41,7 @@ ASCharacter::ASCharacter()
 	WeaponAttachSocketName = "WeaponSocket";
 	WeaponBackSocketName = "WeaponBackSocket";
 
-	ARAmmo = 120;
+	ARAmmo = 240;
 	ShotgunAmmo = 10;
 	SniperAmmo = 10;
 }
@@ -204,6 +205,19 @@ void ASCharacter::PickUpWeapon()
 		{
 			Money = Money - WeaponPickupCost;
 			SetWeapon(WeaponPickUpClass);
+			
+			if (AmmoTypeToAdd == EAmmoType::ARAmmo) 
+			{
+				ARAmmo += 240;
+			}
+			if (AmmoTypeToAdd == EAmmoType::ShotgunAmmo)
+			{
+				ShotgunAmmo += 20;
+			}
+			if (AmmoTypeToAdd == EAmmoType::SniperAmmo)
+			{
+				SniperAmmo += 10;
+			}
 		}
 
 	}
@@ -341,6 +355,9 @@ void ASCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
 		WeaponPickupCost = temp->WeaponPrice;
 		WeaponPickUpClass = temp->WeaponClass;
 		bPlayerOverWeapon = true;
+
+		AmmoTypeToAdd = temp->AmmoType;
+
 	}
 
 	//for opening doors
