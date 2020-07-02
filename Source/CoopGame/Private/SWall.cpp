@@ -34,33 +34,10 @@ void ASWall::Tick(float DeltaTime)
 
 void ASWall::Open()
 {
-	if (SpawnPoint1) 
+	for (auto& Spawn : SpawnPoints)
 	{
-		SpawnPoint1->Tags.Add(FName("ActiveSpawn"));
+		Spawn->Tags.Add(FName("ActiveSpawn"));
 	}
-	if (SpawnPoint2)
-	{
-		SpawnPoint2->Tags.Add(FName("ActiveSpawn"));
-	}
-	if (SpawnPoint3)
-	{
-		SpawnPoint3->Tags.Add(FName("ActiveSpawn"));
-	}
-	if (SpawnPoint4)
-	{
-		SpawnPoint4->Tags.Add(FName("ActiveSpawn"));
-	}
-	if (SpawnPoint5)
-	{
-		SpawnPoint5->Tags.Add(FName("ActiveSpawn"));
-	}
-	if (SpawnPoint6)
-	{
-		SpawnPoint6->Tags.Add(FName("ActiveSpawn"));
-	}
-	if (SpawnPoint7)
-	{
-		SpawnPoint7->Tags.Add(FName("ActiveSpawn"));
-	}
+
 	Destroy();
 }

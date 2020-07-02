@@ -30,7 +30,10 @@ protected:
 	UBoxComponent* BoxComp;
 
 public:
+	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
+	TArray<AActor*> SpawnPoints;
 
+	/*
 	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
 	AActor* SpawnPoint1;
 
@@ -51,6 +54,7 @@ public:
 
 	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
 	AActor* SpawnPoint7;
+	*/
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

@@ -15,6 +15,7 @@
 #include "Sound/SoundCue.h"
 #include "EngineUtils.h"
 #include "CoopGame/CoopGame.h"
+#include "SWall.h"
 
 // Sets default values
 ASBouncingBot::ASBouncingBot()
@@ -208,6 +209,12 @@ void ASBouncingBot::IsTouchingGround()
 
 		//Blocking hit, process damage
 		AActor* HitActor = Hit.GetActor();
+		
+		ASWall* temp = Cast<ASWall>(HitActor);
+		if (temp) 
+		{
+			return;
+		}
 		//UE_LOG(LogTemp, Warning, TEXT("object grounded"))
 		bGrounded = true;
 		return;
