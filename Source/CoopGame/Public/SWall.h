@@ -40,6 +40,18 @@ public:
 	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
 	AActor* SpawnPoint3;
 
+	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
+	AActor* SpawnPoint4;
+
+	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
+	AActor* SpawnPoint5;
+
+	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
+	AActor* SpawnPoint6;
+
+	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
+	AActor* SpawnPoint7;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

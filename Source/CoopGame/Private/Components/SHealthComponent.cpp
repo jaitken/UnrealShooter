@@ -4,6 +4,7 @@
 #include "Components/SHealthComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "SGameMode.h"
+#include "AI/SBouncingBot.h"
 #include "SCharacter.h"
 
 // Sets default values for this component's properties
@@ -58,12 +59,17 @@ void USHealthComponent::HandleTakeAnyDamage(AActor * DamagedActor, float Damage,
 	}
 
 
-	//friendly fire
-	if ((DamageCauser != DamagedActor) && IsFriendly(DamagedActor, DamageCauser))
+	//friendly fire (Except if it is a bouncing bot)
+	ASBouncingBot* temp = Cast<ASBouncingBot>(DamageCauser);
+	if (!temp) 
 	{
-		UE_LOG(LogTemp, Log, TEXT("Damage Ignored"));
-		return;
+		if ((DamageCauser != DamagedActor) && IsFriendly(DamagedActor, DamageCauser))
+		{
+			UE_LOG(LogTemp, Log, TEXT("Damage Ignored"));
+			return;
+		}
 	}
+	
 	
 
 	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);

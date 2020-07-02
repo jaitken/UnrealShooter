@@ -281,7 +281,8 @@ void ASBouncingBot::NotifyActorBeginOverlap(AActor * OtherActor)
 	if (!bStartedSelfDestruction && !bExploded)
 	{
 		ASCharacter* PlayerPawn = Cast<ASCharacter>(OtherActor);
-		if (PlayerPawn && !USHealthComponent::IsFriendly(this, OtherActor))
+
+		if (PlayerPawn && PlayerPawn->bIsPlayer)
 		{
 			//overlapped player
 			if (GetLocalRole() == ROLE_Authority)
