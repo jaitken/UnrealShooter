@@ -154,6 +154,9 @@ public:
 	float SniperAmmo;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
+	float LightAmmo;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 	float Money;
 
 	float WeaponPickupCost;

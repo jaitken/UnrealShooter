@@ -44,6 +44,7 @@ ASCharacter::ASCharacter()
 	ARAmmo = 240;
 	ShotgunAmmo = 10;
 	SniperAmmo = 10;
+	LightAmmo = 300;
 }
 
 
@@ -208,7 +209,7 @@ void ASCharacter::PickUpWeapon()
 			
 			if (AmmoTypeToAdd == EAmmoType::ARAmmo) 
 			{
-				ARAmmo += 240;
+				ARAmmo += 180;
 			}
 			if (AmmoTypeToAdd == EAmmoType::ShotgunAmmo)
 			{
@@ -217,6 +218,10 @@ void ASCharacter::PickUpWeapon()
 			if (AmmoTypeToAdd == EAmmoType::SniperAmmo)
 			{
 				SniperAmmo += 10;
+			}
+			if (AmmoTypeToAdd == EAmmoType::LightAmmo)
+			{
+				LightAmmo += 240;
 			}
 		}
 

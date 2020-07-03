@@ -18,7 +18,9 @@ enum class EAmmoType : uint8
 
 	ShotgunAmmo,
 
-	SniperAmmo
+	SniperAmmo, 
+
+	LightAmmo
 
 
 };
