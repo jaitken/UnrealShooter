@@ -8,6 +8,7 @@
 #include "SPlayerState.h"
 #include "Components/SHealthComponent.h"
 #include "EngineUtils.h"
+#include "AI/SBouncingBot.h"
 
 
 
@@ -79,6 +80,14 @@ void ASGameMode::CheckWaveState()
 				continue;
 			}
 
+			//ignore bouncing bots
+			ASBouncingBot* TestBot = Cast<ASBouncingBot>(TestPawn);
+			if (TestBot)
+			{
+				continue;
+			}
+
+			
 			USHealthComponent* HealthComp = Cast<USHealthComponent>(TestPawn->GetComponentByClass(USHealthComponent::StaticClass()));
 			if (HealthComp && HealthComp->GetHealth() > 0.0f)
 			{
