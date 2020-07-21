@@ -14,6 +14,7 @@
 
 void ASDBShotgun::Fire()
 {
+
 	if (CurrentAmmo > 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("DB Fire Called"))
@@ -21,6 +22,7 @@ void ASDBShotgun::Fire()
 		AActor* MyOwner = GetOwner();
 		if (MyOwner)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("get owner is success"))
 			FCollisionQueryParams QueryParams;
 			QueryParams.AddIgnoredActor(MyOwner);
 			QueryParams.AddIgnoredActor(this);
@@ -34,6 +36,10 @@ void ASDBShotgun::Fire()
 
 			FVector ShotDirection = EyeRotation.Vector();
 
+			float Yaw = EyeRotation.Yaw;
+
+			UE_LOG(LogTemp, Warning, TEXT("Yaw: %f"), Yaw);
+
 			//offset Eyelocation so the line trace starts more in line with muzzlelocation
 			EyeLocation = EyeLocation + (ShotDirection * 175);
 
@@ -42,40 +48,84 @@ void ASDBShotgun::Fire()
 			{
 				//switch statment/offset vector to give a nice even bullet spread
 				FVector offset = FVector(0, 0, 0);
-				switch (i)
+				if ((Yaw >= 45 && Yaw < 135) || (Yaw >= 225 && Yaw < 315)) 
 				{
-				default:
-					break;
-				case 0:
-					offset = FVector(0, -100, 100);
-					break;
-				case 1:
-					offset = FVector(0, -50, 120);
-					break;
-				case 2:
-					offset = FVector(0, 50, 120);
-					break;
-				case 3:
-					offset = FVector(0, 100, 100);
-					break;
-				case 4:
-					offset = FVector(0, -50, 50);
-					break;
-				case 5:
-					offset = FVector(0, 50, 50);
-					break;
-				case 6:
-					offset = FVector(0, -100, -100);
-					break;
-				case 7:
-					offset = FVector(0, -50, -120);
-					break;
-				case 8:
-					offset = FVector(0, 50, -120);
-					break;
-				case 9:
-					offset = FVector(0, 100, -100);
-					break;
+					switch (i)
+					{
+					default:
+						break;
+					case 0:
+						offset = FVector(-150, 0, 75);
+						break;
+					case 1:
+						offset = FVector(0, 0, 75);
+						break;
+					case 2:
+						offset = FVector(150, 0, 75);
+						break;
+					case 3:
+						offset = FVector(-200, 0, 0);
+						break;
+					case 4:
+						offset = FVector(-75, 0, 0);
+						break;
+					case 5:
+						offset = FVector(75, 0, 0);
+						break;
+					case 6:
+						offset = FVector(200, 0, 0);
+						break;
+					case 7:
+						offset = FVector(-150, 0, -75);
+						break;
+					case 8:
+						offset = FVector(0, 0, -75);
+						break;
+					case 9:
+						offset = FVector(150, 0, -75);
+						break;
+
+					}
+
+				}
+				else
+				{
+					switch (i)
+					{
+					default:
+						break;
+					case 0:
+						offset = FVector(0, -150, 75);
+						break;
+					case 1:
+						offset = FVector(0, 0, 75);
+						break;
+					case 2:
+						offset = FVector(0, 150, 75);
+						break;
+					case 3:
+						offset = FVector(0, -200, 0);
+						break;
+					case 4:
+						offset = FVector(0, -75, 0);
+						break;
+					case 5:
+						offset = FVector(0, 75, 0);
+						break;
+					case 6:
+						offset = FVector(0, 200, 0);
+						break;
+					case 7:
+						offset = FVector(0, -150, -75);
+						break;
+					case 8:
+						offset = FVector(0, 0, -75);
+						break;
+					case 9:
+						offset = FVector(0, 150, -75);
+						break;
+
+					}
 
 				}
 
@@ -117,11 +167,12 @@ void ASDBShotgun::Fire()
 				UGameplayStatics::PlaySoundAtLocation(this, ShotSound, MuzzleLocation);
 
 
-				DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Red, false, 10.0f, 0, 1.0f);
+				//DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Red, false, 10.0f, 0, 2.0f);
 
 				LastFireTime = GetWorld()->TimeSeconds;
 
 			}
+			reloading = false;
 			CurrentAmmo--;
 
 
@@ -138,47 +189,57 @@ void ASDBShotgun::Fire()
 
 void ASDBShotgun::StartReload()
 {
-	//don't reload if magazine already full
-	if (CurrentAmmo == MagSize)
-	{
-		return;
-	}
-	//only reload if player has ammo
-	AActor* MyOwner = GetOwner();
-	ASCharacter* MyCharacter = Cast<ASCharacter>(MyOwner);
 
-	if (MyCharacter->ShotgunAmmo > 0)
-	{
-		//play sound
-		FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
-		UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, MuzzleLocation);
+		//don't reload if magazine already full
+		if (CurrentAmmo == MagSize)
+		{
+			return;
+		}
+		//only reload if player has ammo
+		AActor* MyOwner = GetOwner();
+		ASCharacter* MyCharacter = Cast<ASCharacter>(MyOwner);
 
-		reloading = true;
-		StopFire();
-		GetWorldTimerManager().SetTimer(TimerHandle_ReloadTime, this, &ASDBShotgun::FinishReload, ReloadTime, false);
-	}
+		if (MyCharacter->ShotgunAmmo > 0)
+		{
+			//play sound
+			FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+			UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, MuzzleLocation);
 
+			reloading = true;
+			StopFire();
+			GetWorldTimerManager().SetTimer(TimerHandle_ReloadTime, this, &ASDBShotgun::FinishReload, ReloadTime, false);
+		}
 }
 
 void ASDBShotgun::FinishReload()
 {
-	reloading = false;
+		AActor* MyOwner = GetOwner();
+		ASCharacter* MyCharacter = Cast<ASCharacter>(MyOwner);
 
-	AActor* MyOwner = GetOwner();
-	ASCharacter* MyCharacter = Cast<ASCharacter>(MyOwner);
+		float NeededAmmo = MagSize - CurrentAmmo;
+		if (MyCharacter->ShotgunAmmo >= NeededAmmo)
+		{
+			CurrentAmmo = CurrentAmmo + 1;
+			MyCharacter->ShotgunAmmo = MyCharacter->ShotgunAmmo - 1;
+		}
+		else
+		{
+			CurrentAmmo = CurrentAmmo + 1;
+			MyCharacter->ShotgunAmmo = 0;
+		}
 
-	float NeededAmmo = MagSize - CurrentAmmo;
-	if (MyCharacter->ShotgunAmmo >= NeededAmmo)
-	{
-		CurrentAmmo = MagSize;
-		MyCharacter->ShotgunAmmo = MyCharacter->ShotgunAmmo - NeededAmmo;
-	}
-	else
-	{
-		CurrentAmmo = CurrentAmmo + MyCharacter->ShotgunAmmo;
-		MyCharacter->ShotgunAmmo = 0;
-	}
+		GetWorldTimerManager().ClearTimer(TimerHandle_ReloadTime);
 
-	GetWorldTimerManager().ClearTimer(TimerHandle_ReloadTime);
+		if (reloading) 
+		{
+			if (CurrentAmmo < MagSize)
+			{
+				StartReload();
 
+			}
+		}
+		
+		
+	
 }
+

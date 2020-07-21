@@ -26,4 +26,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 		float PelletCount;
+	
+	bool ReloadCancel;
+
 };

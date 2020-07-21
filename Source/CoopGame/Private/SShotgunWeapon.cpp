@@ -40,46 +40,91 @@ void ASShotgunWeapon::Fire()
 			//offset Eyelocation so the line trace starts more in line with muzzlelocation
 			EyeLocation = EyeLocation + (ShotDirection * 175);
 
+			float Yaw = EyeRotation.Yaw;
 
 			for (int i = 0; i < PelletCount; i++)
 			{
 				//switch statment/offset vector to give a nice even bullet spread
 				FVector offset = FVector(0, 0, 0);
-				switch (i)
+				if ((Yaw >= 45 && Yaw < 135) || (Yaw >= 225 && Yaw < 315))
 				{
+					switch (i)
+					{
 					default:
 						break;
 					case 0:
-						offset = FVector(0, -100, 100);
+						offset = FVector(-150, 0, 75);
 						break;
 					case 1:
-						offset = FVector(0, -50, 120);
+						offset = FVector(0, 0, 75);
 						break;
 					case 2:
-						offset = FVector(0, 50, 120);
+						offset = FVector(150, 0, 75);
 						break;
 					case 3:
-						offset = FVector(0, 100, 100);
+						offset = FVector(-200, 0, 0);
 						break;
 					case 4:
-						offset = FVector(0, -50, 50);
+						offset = FVector(-75, 0, 0);
 						break;
 					case 5:
-						offset = FVector(0, 50, 50);
+						offset = FVector(75, 0, 0);
 						break;
 					case 6:
-						offset = FVector(0, -100, -100);
+						offset = FVector(200, 0, 0);
 						break;
 					case 7:
-						offset = FVector(0, -50, -120);
+						offset = FVector(-150, 0, -75);
 						break;
 					case 8:
-						offset = FVector(0, 50, -120);
+						offset = FVector(0, 0, -75);
 						break;
 					case 9:
-						offset = FVector(0, 100, -100);
+						offset = FVector(150, 0, -75);
 						break;
-					
+
+					}
+
+				}
+				else
+				{
+					switch (i)
+					{
+					default:
+						break;
+					case 0:
+						offset = FVector(0, -150, 75);
+						break;
+					case 1:
+						offset = FVector(0, 0, 75);
+						break;
+					case 2:
+						offset = FVector(0, 150, 75);
+						break;
+					case 3:
+						offset = FVector(0, -200, 0);
+						break;
+					case 4:
+						offset = FVector(0, -75, 0);
+						break;
+					case 5:
+						offset = FVector(0, 75, 0);
+						break;
+					case 6:
+						offset = FVector(0, 200, 0);
+						break;
+					case 7:
+						offset = FVector(0, -150, -75);
+						break;
+					case 8:
+						offset = FVector(0, 0, -75);
+						break;
+					case 9:
+						offset = FVector(0, 150, -75);
+						break;
+
+					}
+
 				}
 				
 

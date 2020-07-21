@@ -11,6 +11,7 @@
 #include "SBeamRifle.h"
 #include "SWall.h"
 #include "AmmoPickup.h"
+#include "SDBShotgun.h"
 
 
 // Sets default values
@@ -126,6 +127,14 @@ void ASCharacter::StartFire()
 {
 	if (CurrentWeapon)
 	{
+		ASDBShotgun* temp = Cast<ASDBShotgun>(CurrentWeapon);
+		if (temp)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("DB Shotgun in hand"))
+			CurrentWeapon->StartFire();
+			return;
+		}
+
 		if (!CurrentWeapon->reloading)
 		{
 			CurrentWeapon->StartFire();
