@@ -12,6 +12,8 @@
 #include "TimerManager.h"
 #include "Sound/SoundCue.h"
 #include "SCharacter.h"
+#include "Misc/DateTime.h"
+#include "Misc/Timespan.h"
 
 
 static int32 DebugWeaponDrawing = 0;
@@ -32,7 +34,7 @@ ASWeapon::ASWeapon()
 	TracerTargetName = "Target";
 	BaseDamage = 20.0f;
 
-	BulletSpread = 2.0f;
+	MaxBulletSpread = 1.0f;
 
 	RateOfFire = 600.0f;
 	MagSize = 30;
@@ -63,20 +65,25 @@ void ASWeapon::Fire()
 
 			FVector EyeLocation;
 			FRotator EyeRotation;
-
 			MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
-
 			FVector ShotDirection = EyeRotation.Vector();
 
 			//bullet spread
-			
+			FDateTime DT = FDateTime::Now();
+			int32 CurrTimeMS = ((DT.GetHour() * 60 * 60) + (DT.GetMinute() * 60) + DT.GetSecond()) * 1000 + DT.GetMillisecond();
+			int32 ContinousFireTime = CurrTimeMS - FireStartTime;
+			UE_LOG(LogTemp, Warning, TEXT("Conitous Fire Time:  %d"), ContinousFireTime);
+			float BulletSpread = (ContinousFireTime / BulletSpreadTimer) * MaxBulletSpread;
+			BulletSpread = BulletSpread + MinBulletSpread;
+			if (BulletSpread > MaxBulletSpread) 
+			{
+				BulletSpread = MaxBulletSpread;
+			}
 			float HalfRad = FMath::DegreesToRadians(BulletSpread);
 			ShotDirection  = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
 			
 			
 			FVector TraceEnd = EyeLocation + (ShotDirection * 10000);
-			
-
 			//offset Eyelocation so the line trace starts more in line with muzzlelocation
 			EyeLocation = EyeLocation + (ShotDirection * 175);
 

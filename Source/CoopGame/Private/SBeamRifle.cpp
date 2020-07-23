@@ -77,7 +77,7 @@ void ASBeamRifle::Fire()
 
 			//bullet spread
 
-			float HalfRad = FMath::DegreesToRadians(BulletSpread);
+			float HalfRad = FMath::DegreesToRadians(MaxBulletSpread);
 			ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
 
 

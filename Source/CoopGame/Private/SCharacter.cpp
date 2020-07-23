@@ -12,6 +12,8 @@
 #include "SWall.h"
 #include "AmmoPickup.h"
 #include "SDBShotgun.h"
+#include "Misc/DateTime.h"
+#include "Misc/Timespan.h"
 
 
 // Sets default values
@@ -127,6 +129,8 @@ void ASCharacter::StartFire()
 {
 	if (CurrentWeapon)
 	{
+		//if weapon is double barrel shotgun ignore reloading restriction
+		/*
 		ASDBShotgun* temp = Cast<ASDBShotgun>(CurrentWeapon);
 		if (temp)
 		{
@@ -134,7 +138,18 @@ void ASCharacter::StartFire()
 			CurrentWeapon->StartFire();
 			return;
 		}
-
+		*/
+		FDateTime DT = FDateTime::Now();
+		int32 CurrentTimeH = DT.GetHour();
+		int32 CurrentTimeM = DT.GetMinute();
+		int32 CurrentTimeS = DT.GetSecond();
+		int32 CurrentTimeMi = DT.GetMillisecond();
+		StartTime = ((DT.GetHour() * 60 * 60) + (DT.GetMinute() * 60) + DT.GetSecond())*1000 + DT.GetMillisecond();
+		CurrentWeapon->FireStartTime = StartTime;
+		UE_LOG(LogTemp, Log, TEXT("%d : %d : %d : %d"), CurrentTimeH, CurrentTimeM, CurrentTimeS, CurrentTimeMi);
+		
+		
+		
 		if (!CurrentWeapon->reloading)
 		{
 			CurrentWeapon->StartFire();
@@ -147,7 +162,17 @@ void ASCharacter::StopFire()
 {
 	if (CurrentWeapon)
 	{
+		FDateTime DT = FDateTime::Now();
+		int32 EndTimeH = DT.GetHour();
+		int32 EndTimeM = DT.GetMinute();
+		int32 EndTimeS = DT.GetSecond();
+		int32 EndTimeMi = DT.GetMillisecond();
+		int32 CurrTimeMS = ((DT.GetHour() * 60 * 60) + (DT.GetMinute() * 60) + DT.GetSecond())*1000 + DT.GetMillisecond();
+		int32 TimeBetween = CurrTimeMS - StartTime;
+		UE_LOG(LogTemp, Log, TEXT("%d : %d : %d : %d"), EndTimeH, EndTimeM, EndTimeS, EndTimeMi);
+		//UE_LOG(LogTemp, Warning, TEXT("TIMEBETWEEN  %d"), TimeBetween);
 		CurrentWeapon->StopFire();
+		CurrentWeapon->FireStartTime = 0;
 	}
 }
 

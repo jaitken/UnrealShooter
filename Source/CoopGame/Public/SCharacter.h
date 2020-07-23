@@ -165,4 +165,8 @@ public:
 
 	EAmmoType AmmoTypeToAdd;
 
+
+	//shottimer
+	int32 StartTime;
+
 };

@@ -77,7 +77,10 @@ protected:
 
 	//bullet spread in degrees
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0.0f))
-	float BulletSpread;
+	float MaxBulletSpread;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0.0f))
+	float MinBulletSpread;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	float MagSize;
@@ -124,5 +127,11 @@ public:
 	virtual void FinishReload();
 
 	bool reloading;
+
+	int32 FireStartTime;
+
+	//time to reach max bullet spread in MS
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	float BulletSpreadTimer;
 
 };

@@ -32,7 +32,16 @@ void ASSMG::Fire()
 			FVector ShotDirection = EyeRotation.Vector();
 
 			//bullet spread
-
+			FDateTime DT = FDateTime::Now();
+			int32 CurrTimeMS = ((DT.GetHour() * 60 * 60) + (DT.GetMinute() * 60) + DT.GetSecond()) * 1000 + DT.GetMillisecond();
+			int32 ContinousFireTime = CurrTimeMS - FireStartTime;
+			UE_LOG(LogTemp, Warning, TEXT("Conitous Fire Time:  %d"), ContinousFireTime);
+			float BulletSpread = (ContinousFireTime / BulletSpreadTimer) * MaxBulletSpread;
+			BulletSpread = BulletSpread + MinBulletSpread;
+			if (BulletSpread > MaxBulletSpread)
+			{
+				BulletSpread = MaxBulletSpread;
+			}
 			float HalfRad = FMath::DegreesToRadians(BulletSpread);
 			ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
 

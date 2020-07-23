@@ -17,12 +17,11 @@ void ASDBShotgun::Fire()
 
 	if (CurrentAmmo > 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("DB Fire Called"))
 		//trace a line from pawn eyes to crosshair location(center screen)
 		AActor* MyOwner = GetOwner();
 		if (MyOwner)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("get owner is success"))
+
 			FCollisionQueryParams QueryParams;
 			QueryParams.AddIgnoredActor(MyOwner);
 			QueryParams.AddIgnoredActor(this);
@@ -37,8 +36,6 @@ void ASDBShotgun::Fire()
 			FVector ShotDirection = EyeRotation.Vector();
 
 			float Yaw = EyeRotation.Yaw;
-
-			UE_LOG(LogTemp, Warning, TEXT("Yaw: %f"), Yaw);
 
 			//offset Eyelocation so the line trace starts more in line with muzzlelocation
 			EyeLocation = EyeLocation + (ShotDirection * 175);
@@ -212,7 +209,8 @@ void ASDBShotgun::StartReload()
 }
 
 void ASDBShotgun::FinishReload()
-{
+{	
+		reloading = false;
 		AActor* MyOwner = GetOwner();
 		ASCharacter* MyCharacter = Cast<ASCharacter>(MyOwner);
 
@@ -230,14 +228,13 @@ void ASDBShotgun::FinishReload()
 
 		GetWorldTimerManager().ClearTimer(TimerHandle_ReloadTime);
 
-		if (reloading) 
+		
+		if (CurrentAmmo < MagSize)
 		{
-			if (CurrentAmmo < MagSize)
-			{
-				StartReload();
+			StartReload();
 
-			}
 		}
+		
 		
 		
 	
