@@ -6,6 +6,10 @@
 #include "SGameMode.h"
 #include "AI/SBouncingBot.h"
 #include "SCharacter.h"
+#include "TimerManager.h"
+#include "GameFramework/Actor.h"
+#include "EngineUtils.h"
+#include "Engine/World.h"
 
 // Sets default values for this component's properties
 USHealthComponent::USHealthComponent()
@@ -40,6 +44,14 @@ void USHealthComponent::BeginPlay()
 	}
 	
 	Health = DefaultHealth;
+
+	//if the health component belongs to the player character apply healing overtime
+	AActor* MyOwner = GetOwner();
+	ASCharacter* MyCharacter = Cast<ASCharacter>(MyOwner);
+	if (MyCharacter)
+	{
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_HealSelf, this, &USHealthComponent::HealSelf, .05f, true);
+	}
 	
 }
 
@@ -71,11 +83,16 @@ void USHealthComponent::HandleTakeAnyDamage(AActor * DamagedActor, float Damage,
 	}
 	
 	
-
+	//apply damage while clamping health to 0/default health
 	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_Damage);
+	DamagedRecently = true;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Damage, this, &USHealthComponent::ResetDamagedRecently, 3.0f, false);
+	
 
-	UE_LOG(LogTemp, Log, TEXT("Health Changed: %s"), *FString::SanitizeFloat(Health));
+	//UE_LOG(LogTemp, Log, TEXT("Health Changed: %s"), *FString::SanitizeFloat(Health));
 
+	//if target is dead mark the IsDead bool
 	bIsDead = Health <= 0.0f;
 
 	OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCauser);
@@ -97,6 +114,27 @@ void USHealthComponent::HandleTakeAnyDamage(AActor * DamagedActor, float Damage,
 		
 	}
 	
+}
+
+void USHealthComponent::HealSelf()
+{
+	if (DamagedRecently) {
+		UE_LOG(LogTemp, Log, TEXT("Damaged"));
+
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Not Damaged"));
+
+	}
+	if (!DamagedRecently && !bIsDead)
+	{
+		Health += 3;
+	}
+}
+
+void USHealthComponent::ResetDamagedRecently()
+{
+	DamagedRecently = false;
 }
 
 float USHealthComponent::GetHealth() const

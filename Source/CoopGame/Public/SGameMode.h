@@ -7,6 +7,8 @@
 #include "SGameState.h"
 #include "SGameMode.generated.h"
 
+class USoundCue;
+
 enum class EWaveState : uint8;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnActorKilled, AActor*, VictimActor, AActor*, KillerActor, AController*, KillerController);
@@ -81,5 +83,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "GameMode")
 	void AddScore(float ScoreDelta);
+
+	UPROPERTY(EditDefaultsOnly, Category = "SpawnPoints")
+	TArray<USoundCue*> WaveSounds;
 
 };

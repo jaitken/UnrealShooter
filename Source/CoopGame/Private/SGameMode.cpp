@@ -9,6 +9,9 @@
 #include "Components/SHealthComponent.h"
 #include "EngineUtils.h"
 #include "AI/SBouncingBot.h"
+#include "Sound/SoundCue.h"
+#include "Kismet/GameplayStatics.h"
+#include "SCharacter.h"
 
 
 
@@ -45,7 +48,38 @@ void ASGameMode::PrepareForNextWave()
 void ASGameMode::StartWave()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("STARTWAVE CALLED"));
+	ACharacter* myCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	//myCharacter->GetActorLocation();
 	WaveCount++;
+	
+	//PlaySound for WaveStart, make time between waves longer after first wave
+	switch (WaveCount) 
+	{
+	default:
+		break;
+	case 1:
+		UGameplayStatics::PlaySoundAtLocation(this, WaveSounds[WaveCount - 1], myCharacter->GetActorLocation());
+		TimeBetweenWaves = 10.f;
+	case 2:
+		UGameplayStatics::PlaySoundAtLocation(this, WaveSounds[WaveCount - 1], myCharacter->GetActorLocation());
+	case 3:
+		UGameplayStatics::PlaySoundAtLocation(this, WaveSounds[WaveCount - 1], myCharacter->GetActorLocation());
+	case 4:
+		UGameplayStatics::PlaySoundAtLocation(this, WaveSounds[WaveCount - 1], myCharacter->GetActorLocation());
+	case 5:
+		UGameplayStatics::PlaySoundAtLocation(this, WaveSounds[WaveCount - 1], myCharacter->GetActorLocation());
+	case 6:
+		UGameplayStatics::PlaySoundAtLocation(this, WaveSounds[WaveCount - 1], myCharacter->GetActorLocation());
+	case 7:
+		UGameplayStatics::PlaySoundAtLocation(this, WaveSounds[WaveCount - 1], myCharacter->GetActorLocation());
+	case 8:
+		UGameplayStatics::PlaySoundAtLocation(this, WaveSounds[WaveCount - 1], myCharacter->GetActorLocation());
+	case 9:
+		UGameplayStatics::PlaySoundAtLocation(this, WaveSounds[WaveCount - 1], myCharacter->GetActorLocation());
+	case 10:
+		UGameplayStatics::PlaySoundAtLocation(this, WaveSounds[WaveCount - 1], myCharacter->GetActorLocation());
+
+	}
 	if (WaveCount <= 5) {
 		NumOfBotsToSpawn = 2 * WaveCount;
 	}

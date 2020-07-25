@@ -43,6 +43,16 @@ protected:
 	UFUNCTION()
 	void HandleTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
+	FTimerHandle TimerHandle_HealSelf;
+
+	void HealSelf();
+
+	bool DamagedRecently;
+
+	FTimerHandle TimerHandle_Damage;
+
+	void ResetDamagedRecently();
+
 public:
 
 	float GetHealth() const;
