@@ -72,7 +72,7 @@ void ASWeapon::Fire()
 			FDateTime DT = FDateTime::Now();
 			int32 CurrTimeMS = ((DT.GetHour() * 60 * 60) + (DT.GetMinute() * 60) + DT.GetSecond()) * 1000 + DT.GetMillisecond();
 			int32 ContinousFireTime = CurrTimeMS - FireStartTime;
-			UE_LOG(LogTemp, Warning, TEXT("Conitous Fire Time:  %d"), ContinousFireTime);
+			//UE_LOG(LogTemp, Warning, TEXT("Conitous Fire Time:  %d"), ContinousFireTime);
 			float BulletSpread = (ContinousFireTime / BulletSpreadTimer) * MaxBulletSpread;
 			BulletSpread = BulletSpread + MinBulletSpread;
 			if (BulletSpread > MaxBulletSpread) 

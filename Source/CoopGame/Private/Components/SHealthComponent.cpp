@@ -50,7 +50,10 @@ void USHealthComponent::BeginPlay()
 	ASCharacter* MyCharacter = Cast<ASCharacter>(MyOwner);
 	if (MyCharacter)
 	{
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_HealSelf, this, &USHealthComponent::HealSelf, .05f, true);
+		if (MyCharacter->IsPlayerControlled()) 
+		{
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle_HealSelf, this, &USHealthComponent::HealSelf, .05f, true);
+		}
 	}
 	
 }
@@ -82,15 +85,16 @@ void USHealthComponent::HandleTakeAnyDamage(AActor * DamagedActor, float Damage,
 		}
 	}
 	
-	
+	UE_LOG(LogTemp, Log, TEXT("Health: %s"), *FString::SanitizeFloat(Health));
 	//apply damage while clamping health to 0/default health
 	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
+	//Health = Health - Damage;
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_Damage);
 	DamagedRecently = true;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Damage, this, &USHealthComponent::ResetDamagedRecently, 3.0f, false);
 	
-
-	//UE_LOG(LogTemp, Log, TEXT("Health Changed: %s"), *FString::SanitizeFloat(Health));
+	UE_LOG(LogTemp, Log, TEXT("Damage: %f"), Damage);
+	UE_LOG(LogTemp, Log, TEXT("Health Changed: %s"), *FString::SanitizeFloat(Health));
 
 	//if target is dead mark the IsDead bool
 	bIsDead = Health <= 0.0f;
@@ -118,17 +122,11 @@ void USHealthComponent::HandleTakeAnyDamage(AActor * DamagedActor, float Damage,
 
 void USHealthComponent::HealSelf()
 {
-	if (DamagedRecently) {
-		UE_LOG(LogTemp, Log, TEXT("Damaged"));
-
-	}
-	else {
-		UE_LOG(LogTemp, Log, TEXT("Not Damaged"));
-
-	}
-	if (!DamagedRecently && !bIsDead)
+	
+	if (!DamagedRecently && !bIsDead && !(Health > DefaultHealth))
 	{
-		Health += 3;
+		UE_LOG(LogTemp, Log, TEXT("SelfHeal Active"));
+		Health += 1;
 	}
 }
 

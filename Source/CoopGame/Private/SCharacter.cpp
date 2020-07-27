@@ -108,13 +108,13 @@ void ASCharacter::BeginZoom()
 	ASBeamRifle* temp = Cast<ASBeamRifle>(CurrentWeapon);
 	if(temp)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Beam rifle Zoom"));
+		//UE_LOG(LogTemp, Warning, TEXT("Beam rifle Zoom"));
 		ZoomedFOV = SniperFOV;
 		
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("other Zoom"));
+		//UE_LOG(LogTemp, Warning, TEXT("other Zoom"));
 		ZoomedFOV = DefZoomedFOV;
 
 	}
@@ -146,7 +146,7 @@ void ASCharacter::StartFire()
 		int32 CurrentTimeMi = DT.GetMillisecond();
 		StartTime = ((DT.GetHour() * 60 * 60) + (DT.GetMinute() * 60) + DT.GetSecond())*1000 + DT.GetMillisecond();
 		CurrentWeapon->FireStartTime = StartTime;
-		UE_LOG(LogTemp, Log, TEXT("%d : %d : %d : %d"), CurrentTimeH, CurrentTimeM, CurrentTimeS, CurrentTimeMi);
+		//UE_LOG(LogTemp, Log, TEXT("%d : %d : %d : %d"), CurrentTimeH, CurrentTimeM, CurrentTimeS, CurrentTimeMi);
 		
 		
 		
@@ -169,7 +169,7 @@ void ASCharacter::StopFire()
 		int32 EndTimeMi = DT.GetMillisecond();
 		int32 CurrTimeMS = ((DT.GetHour() * 60 * 60) + (DT.GetMinute() * 60) + DT.GetSecond())*1000 + DT.GetMillisecond();
 		int32 TimeBetween = CurrTimeMS - StartTime;
-		UE_LOG(LogTemp, Log, TEXT("%d : %d : %d : %d"), EndTimeH, EndTimeM, EndTimeS, EndTimeMi);
+		//UE_LOG(LogTemp, Log, TEXT("%d : %d : %d : %d"), EndTimeH, EndTimeM, EndTimeS, EndTimeMi);
 		//UE_LOG(LogTemp, Warning, TEXT("TIMEBETWEEN  %d"), TimeBetween);
 		CurrentWeapon->StopFire();
 		CurrentWeapon->FireStartTime = 0;
@@ -220,7 +220,7 @@ void ASCharacter::SwitchWeapon()
 			ASWeapon* WeaponOnBack = BackWeapon;
 			ASWeapon* WeaponInHand = CurrentWeapon;
 
-			UE_LOG(LogTemp, Warning, TEXT("Weapon Switch Attemped"))
+			//UE_LOG(LogTemp, Warning, TEXT("Weapon Switch Attemped"))
 			//put current weapon on back and assign it to Backweapon
 			CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponBackSocketName);
 			BackWeapon = WeaponInHand;
@@ -265,10 +265,10 @@ void ASCharacter::PickUpWeapon()
 
 void ASCharacter::BuyDoor()
 {
-	UE_LOG(LogTemp, Warning, TEXT("BUY Door Attempted"))
+	//UE_LOG(LogTemp, Warning, TEXT("BUY Door Attempted"))
 	if (bPlayerNearDoor)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Door Destoryed"))
+		//UE_LOG(LogTemp, Warning, TEXT("Door Destoryed"))
 
 			if (Money >= DoorCost) 
 			{
