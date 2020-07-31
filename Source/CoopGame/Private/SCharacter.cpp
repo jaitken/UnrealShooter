@@ -64,10 +64,30 @@ void ASCharacter::BeginPlay()
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		Weapon1 = GetWorld()->SpawnActor<ASWeapon>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		if (Weapon1)
+		{
+			Weapon1->SetOwner(this);
+			Weapon1->SetActorHiddenInGame(true);
+		}
+		Weapon2 = GetWorld()->SpawnActor<ASWeapon>(StarterWeaponClass2, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		if (Weapon2)
+		{
+			Weapon2->SetOwner(this);
+			Weapon2->SetActorHiddenInGame(true);
+		}
+		Weapon3 = GetWorld()->SpawnActor<ASWeapon>(StarterWeaponClass3, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		if (Weapon3)
+		{
+			Weapon3->SetOwner(this);
+			Weapon3->SetActorHiddenInGame(true);
+		}
+		
 
+		CurrentWeapon = Weapon1;
 		if (CurrentWeapon)
 		{
+			CurrentWeapon->SetActorHiddenInGame(false);
 			CurrentWeapon->SetOwner(this);
 			CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
 		}
@@ -232,6 +252,46 @@ void ASCharacter::SwitchWeapon()
 	
 }
 
+void ASCharacter::SwitchToWeapon1()
+{
+	//do nothing if weapon1 is out
+	if (CurrentWeapon == Weapon1)
+	{
+		return;
+	}
+	CurrentWeapon->SetActorHiddenInGame(true);
+	CurrentWeapon = Weapon1;
+	CurrentWeapon->SetActorHiddenInGame(false);
+	CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
+
+}
+
+void ASCharacter::SwitchToWeapon2()
+{
+	//do nothing if weapon1 is out
+	if (CurrentWeapon == Weapon2)
+	{
+		return;
+	}
+	CurrentWeapon->SetActorHiddenInGame(true);
+	CurrentWeapon = Weapon2;
+	CurrentWeapon->SetActorHiddenInGame(false);
+	CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
+}
+
+void ASCharacter::SwitchToWeapon3()
+{
+	//do nothing if weapon3 is out
+	if (CurrentWeapon == Weapon3)
+	{
+		return;
+	}
+	CurrentWeapon->SetActorHiddenInGame(true);
+	CurrentWeapon = Weapon3;
+	CurrentWeapon->SetActorHiddenInGame(false);
+	CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
+}
+
 void ASCharacter::PickUpWeapon()
 {
 	if (bPlayerOverWeapon) {
@@ -324,6 +384,13 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	PlayerInputComponent->BindAction("SwitchWeapon", IE_Pressed, this, &ASCharacter::SwitchWeapon);
 	PlayerInputComponent->BindAction("PickUpWeapon", IE_Pressed, this, &ASCharacter::PickUpWeapon);
+
+	PlayerInputComponent->BindAction("SwitchWeapon", IE_Pressed, this, &ASCharacter::SwitchWeapon);
+	PlayerInputComponent->BindAction("SwitchWeapon", IE_Pressed, this, &ASCharacter::SwitchWeapon);
+	
+	PlayerInputComponent->BindAction("SwitchToWeapon1", IE_Pressed, this, &ASCharacter::SwitchToWeapon1);
+	PlayerInputComponent->BindAction("SwitchToWeapon2", IE_Pressed, this, &ASCharacter::SwitchToWeapon2);
+	PlayerInputComponent->BindAction("SwitchToWeapon3", IE_Pressed, this, &ASCharacter::SwitchToWeapon3);
 
 	PlayerInputComponent->BindAction("BuyDoor", IE_Pressed, this, &ASCharacter::BuyDoor);
 

@@ -69,8 +69,24 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	ASWeapon* BackWeapon;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	ASWeapon* Weapon1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	ASWeapon* Weapon2;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	ASWeapon* Weapon3;
+
+
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<ASWeapon> StarterWeaponClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<ASWeapon> StarterWeaponClass2;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<ASWeapon> StarterWeaponClass3;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
 	FName WeaponAttachSocketName;
@@ -87,6 +103,12 @@ protected:
 	bool bDied;
 
 	void SwitchWeapon();
+
+	void SwitchToWeapon1();
+
+	void SwitchToWeapon2();
+
+	void SwitchToWeapon3();
 
 	void PickUpWeapon();
 
