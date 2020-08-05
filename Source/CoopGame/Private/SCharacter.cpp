@@ -234,7 +234,7 @@ void ASCharacter::OnHealthChanged(USHealthComponent* OwningHealthComp, float Hea
 
 void ASCharacter::SwitchWeapon()
 {
-
+	/*
 		if (BackWeapon)
 		{
 			ASWeapon* WeaponOnBack = BackWeapon;
@@ -249,6 +249,7 @@ void ASCharacter::SwitchWeapon()
 			CurrentWeapon = WeaponOnBack;
 
 		}
+		*/
 	
 }
 
@@ -300,7 +301,7 @@ void ASCharacter::PickUpWeapon()
 		{
 			Money = Money - WeaponPickupCost;
 			SetWeapon(WeaponPickUpClass);
-			
+			/*
 			if (AmmoTypeToAdd == EAmmoType::ARAmmo) 
 			{
 				ARAmmo += 180;
@@ -317,6 +318,7 @@ void ASCharacter::PickUpWeapon()
 			{
 				LightAmmo += 240;
 			}
+			*/
 		}
 
 	}
@@ -386,7 +388,6 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("PickUpWeapon", IE_Pressed, this, &ASCharacter::PickUpWeapon);
 
 	PlayerInputComponent->BindAction("SwitchWeapon", IE_Pressed, this, &ASCharacter::SwitchWeapon);
-	PlayerInputComponent->BindAction("SwitchWeapon", IE_Pressed, this, &ASCharacter::SwitchWeapon);
 	
 	PlayerInputComponent->BindAction("SwitchToWeapon1", IE_Pressed, this, &ASCharacter::SwitchToWeapon1);
 	PlayerInputComponent->BindAction("SwitchToWeapon2", IE_Pressed, this, &ASCharacter::SwitchToWeapon2);
@@ -424,31 +425,32 @@ void ASCharacter::SetWeapon(TSubclassOf<ASWeapon> NewWeaponClass)
 {
 	
 		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-		//if no weapon is on back weapon you just picked up goes on back
-		if (!BackWeapon) 
-		{
-			BackWeapon = GetWorld()->SpawnActor<ASWeapon>(NewWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-			BackWeapon->SetOwner(this);
-			BackWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponBackSocketName);
-			return;
-		}
-		
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;		
 		
 		if (CurrentWeapon)
 		{
-			CurrentWeapon->Destroy();
+			ASWeapon* NewWeapon = GetWorld()->SpawnActor<ASWeapon>(NewWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+
+			//determine which type of weapon it is by checking actor tags
+			if (NewWeapon->ActorHasTag(TEXT("Shotgun")))
+			{
+				Weapon2->Destroy();
+				Weapon2 = NewWeapon;
+				Weapon2->SetOwner(this);
+				Weapon2->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
+				CurrentWeapon = Weapon2;
+			}
+			//CurrentWeapon->Destroy();
 		}
 
-		CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(NewWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-
+		//CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(NewWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		/*
 		if (CurrentWeapon)
 		{
 			CurrentWeapon->SetOwner(this);
 			CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
 		}
-	
+		*/
 
 }
 
