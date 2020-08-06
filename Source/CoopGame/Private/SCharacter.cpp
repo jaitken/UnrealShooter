@@ -269,7 +269,7 @@ void ASCharacter::SwitchToWeapon1()
 
 void ASCharacter::SwitchToWeapon2()
 {
-	//do nothing if weapon1 is out
+	//do nothing if weapon2 is out
 	if (CurrentWeapon == Weapon2)
 	{
 		return;
@@ -301,24 +301,7 @@ void ASCharacter::PickUpWeapon()
 		{
 			Money = Money - WeaponPickupCost;
 			SetWeapon(WeaponPickUpClass);
-			/*
-			if (AmmoTypeToAdd == EAmmoType::ARAmmo) 
-			{
-				ARAmmo += 180;
-			}
-			if (AmmoTypeToAdd == EAmmoType::ShotgunAmmo)
-			{
-				ShotgunAmmo += 20;
-			}
-			if (AmmoTypeToAdd == EAmmoType::SniperAmmo)
-			{
-				SniperAmmo += 10;
-			}
-			if (AmmoTypeToAdd == EAmmoType::LightAmmo)
-			{
-				LightAmmo += 240;
-			}
-			*/
+			
 		}
 
 	}
@@ -438,7 +421,8 @@ void ASCharacter::SetWeapon(TSubclassOf<ASWeapon> NewWeaponClass)
 				Weapon2 = NewWeapon;
 				Weapon2->SetOwner(this);
 				Weapon2->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
-				CurrentWeapon = Weapon2;
+				Weapon2->SetActorHiddenInGame(true);
+				//CurrentWeapon = Weapon2;
 			}
 			//CurrentWeapon->Destroy();
 		}
