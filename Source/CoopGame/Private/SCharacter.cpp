@@ -399,6 +399,21 @@ ASWeapon * ASCharacter::GetCurrentWeapon()
 	return CurrentWeapon;
 }
 
+ASWeapon * ASCharacter::GetWeapon1()
+{
+	return Weapon1;
+}
+
+ASWeapon * ASCharacter::GetWeapon2()
+{
+	return Weapon2;
+}
+
+ASWeapon * ASCharacter::GetWeapon3()
+{
+	return Weapon3;
+}
+
 ASWeapon * ASCharacter::GetBackWeapon()
 {
 	return BackWeapon;

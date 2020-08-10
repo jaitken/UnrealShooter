@@ -149,6 +149,15 @@ public:
 	ASWeapon* GetCurrentWeapon();
 
 	UFUNCTION(BlueprintCallable, Category = "Components")
+	ASWeapon* GetWeapon1();
+
+	UFUNCTION(BlueprintCallable, Category = "Components")
+	ASWeapon* GetWeapon2();
+
+	UFUNCTION(BlueprintCallable, Category = "Components")
+	ASWeapon* GetWeapon3();
+
+	UFUNCTION(BlueprintCallable, Category = "Components")
 	ASWeapon* GetBackWeapon();
 
 	void SetWeapon(TSubclassOf<ASWeapon> NewWeaponClass);
