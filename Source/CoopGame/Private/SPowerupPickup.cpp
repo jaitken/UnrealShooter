@@ -58,7 +58,7 @@ void ASPowerupPickup::NotifyActorBeginOverlap(AActor * OtherActor)
 
 	//check to see if overlapped actor is a player
 	ASCharacter* tempChar = Cast<ASCharacter>(OtherActor);
-	if (tempChar && !bIsPowerupActive)
+	if (tempChar && !bIsPowerupActive && tempChar->bIsPlayer)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Character Overlapped"));
 		ActivatePowerup(OtherActor);
