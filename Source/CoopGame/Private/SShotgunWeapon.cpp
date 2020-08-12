@@ -130,11 +130,9 @@ void ASShotgunWeapon::Fire()
 
 				FVector TraceEnd = EyeLocation + (ShotDirection * 4000);
 				TraceEnd = TraceEnd + offset;
-
 				FVector TracerEndPoint = TraceEnd;
 				EPhysicalSurface SurfaceType = SurfaceType_Default;
 				FHitResult Hit;
-
 				if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, COLLISION_WEAPON, QueryParams))
 				{
 
@@ -161,7 +159,7 @@ void ASShotgunWeapon::Fire()
 				PlayFireEffects(TracerEndPoint);
 
 				//Play Sound
-				FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+				//FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 				UGameplayStatics::PlaySoundAtLocation(this, ShotSound, MuzzleLocation);
 				GetWorldTimerManager().SetTimer(TimerHandle_Pump, this, &ASShotgunWeapon::PlayPumpSound, TimeBeforePump, false);
 
@@ -179,7 +177,7 @@ void ASShotgunWeapon::Fire()
 	}
 	else
 	{
-		FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+		//FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 		UGameplayStatics::PlaySoundAtLocation(this, DryFireSound, MuzzleLocation);
 		StartReload();
 	}
@@ -199,7 +197,7 @@ void ASShotgunWeapon::StartReload()
 	if (MyCharacter->ShotgunAmmo > 0)
 	{
 		//play sound
-		FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+		//FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 		UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, MuzzleLocation);
 
 		reloading = true;
@@ -235,7 +233,7 @@ void ASShotgunWeapon::FinishReload()
 
 void ASShotgunWeapon::PlayPumpSound()
 {
-	FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+	//FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 	UGameplayStatics::PlaySoundAtLocation(this, PumpSound, MuzzleLocation);
 
 	GetWorldTimerManager().ClearTimer(TimerHandle_Pump);

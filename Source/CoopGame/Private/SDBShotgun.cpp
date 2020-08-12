@@ -37,10 +37,6 @@ void ASDBShotgun::Fire()
 
 			float Yaw = EyeRotation.Yaw;
 
-			//offset Eyelocation so the line trace starts more in line with muzzlelocation
-			EyeLocation = EyeLocation + (ShotDirection * 175);
-
-
 			for (int i = 0; i < PelletCount; i++)
 			{
 				//switch statment/offset vector to give a nice even bullet spread
@@ -127,21 +123,18 @@ void ASDBShotgun::Fire()
 				}
 
 
+				//first line trace from camera to find impact point
 				FVector TraceEnd = EyeLocation + (ShotDirection * 4000);
 				TraceEnd = TraceEnd + offset;
-
-				FVector TracerEndPoint = TraceEnd;
+				FVector TracerEndPoint;
 				EPhysicalSurface SurfaceType = SurfaceType_Default;
 				FHitResult Hit;
-
 				if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, COLLISION_WEAPON, QueryParams))
 				{
-
-					//Blocking hit, process damage
+					//DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Blue, false, 10.0f, 0, 1.0f);
 					AActor* HitActor = Hit.GetActor();
-
-					//determine surface type
-					SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
+					TracerEndPoint = Hit.ImpactPoint;
+					//DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 2.0f, 12, FColor::Blue, false, 1.0f, 0, 1.0f);
 
 					float ActualDamage = BaseDamage;
 					if (SurfaceType == SURFACE_FLESHVULNERABLE)
@@ -150,17 +143,14 @@ void ASDBShotgun::Fire()
 					}
 
 					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
-
 					PlayImpactEffects(SurfaceType, Hit.ImpactPoint);
 
-					TracerEndPoint = Hit.ImpactPoint;
 				}
 
 				//Play FX
 				PlayFireEffects(TracerEndPoint);
 
 				//Play Sound
-				FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 				UGameplayStatics::PlaySoundAtLocation(this, ShotSound, MuzzleLocation);
 
 
@@ -178,7 +168,6 @@ void ASDBShotgun::Fire()
 	}
 	else
 	{
-		FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 		UGameplayStatics::PlaySoundAtLocation(this, DryFireSound, MuzzleLocation);
 		StartReload();
 	}
@@ -199,7 +188,7 @@ void ASDBShotgun::StartReload()
 		if (MyCharacter->ShotgunAmmo > 0)
 		{
 			//play sound
-			FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+			//FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 			UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, MuzzleLocation);
 
 			reloading = true;

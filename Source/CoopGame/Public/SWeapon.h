@@ -116,6 +116,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	USoundCue* DryFireSound;
 
+	FVector MuzzleLocation;
+
 public:	
 
 	void StartFire();

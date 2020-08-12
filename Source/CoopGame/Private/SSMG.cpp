@@ -23,7 +23,7 @@ void ASSMG::Fire()
 		AActor* MyOwner = GetOwner();
 		if (MyOwner)
 		{
-
+			//FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 			FVector EyeLocation;
 			FRotator EyeRotation;
 
@@ -45,13 +45,6 @@ void ASSMG::Fire()
 			float HalfRad = FMath::DegreesToRadians(BulletSpread);
 			ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
 
-
-			FVector TraceEnd = EyeLocation + (ShotDirection * 10000);
-
-
-			//offset Eyelocation so the line trace starts more in line with muzzlelocation
-			EyeLocation = EyeLocation + (ShotDirection * 175);
-
 			FCollisionQueryParams QueryParams;
 			QueryParams.AddIgnoredActor(MyOwner);
 			QueryParams.AddIgnoredActor(this);
@@ -59,21 +52,28 @@ void ASSMG::Fire()
 			QueryParams.bReturnPhysicalMaterial = true;
 
 
+			//first line trace from camera to find impact point
+			FVector TraceEnd = EyeLocation + (ShotDirection * 10000);
 			FVector TracerEndPoint = TraceEnd;
-
 			EPhysicalSurface SurfaceType = SurfaceType_Default;
-
-
 			FHitResult Hit;
-
 			if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, COLLISION_WEAPON, QueryParams))
 			{
-
-				//Blocking hit, process damage
+				//DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Blue, false, 1.0f, 0, 1.0f);
 				AActor* HitActor = Hit.GetActor();
+				TracerEndPoint = Hit.ImpactPoint;
+			}
+
+			//second line trace from weapon to impact point
+			FHitResult Hit1;
+			if (GetWorld()->LineTraceSingleByChannel(Hit1, MuzzleLocation, TracerEndPoint, COLLISION_WEAPON, QueryParams))
+			{
+				DrawDebugLine(GetWorld(), MuzzleLocation, TracerEndPoint, FColor::Red, false, 3.0f, 0, 1.0f);
+				//Blocking hit, process damage
+				AActor* HitActor = Hit1.GetActor();
 
 				//determine surface type
-				SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
+				SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit1.PhysMaterial.Get());
 
 				float ActualDamage = BaseDamage;
 				if (SurfaceType == SURFACE_FLESHVULNERABLE)
@@ -81,18 +81,15 @@ void ASSMG::Fire()
 					ActualDamage *= 4.0f;
 				}
 
-				UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
-
-				PlayImpactEffects(SurfaceType, Hit.ImpactPoint);
-
-				TracerEndPoint = Hit.ImpactPoint;
+				UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit1, MyOwner->GetInstigatorController(), MyOwner, DamageType);
+				PlayImpactEffects(SurfaceType, Hit1.ImpactPoint);
+				TracerEndPoint = Hit1.ImpactPoint;
 			}
 
 
 			PlayFireEffects(TracerEndPoint);
 
 			//Play Sound 
-			FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 			UGameplayStatics::PlaySoundAtLocation(this, ShotSound, MuzzleLocation);
 
 
@@ -110,7 +107,7 @@ void ASSMG::Fire()
 	else
 	{
 		//play dry fire sound and start reload
-		FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+		//FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 		UGameplayStatics::PlaySoundAtLocation(this, DryFireSound, MuzzleLocation);
 		StartReload();
 	}
@@ -132,7 +129,7 @@ void ASSMG::StartReload()
 	if (MyCharacter->LightAmmo > 0)
 	{
 		//play sound
-		FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+		//FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 		UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, MuzzleLocation);
 
 		reloading = true;
