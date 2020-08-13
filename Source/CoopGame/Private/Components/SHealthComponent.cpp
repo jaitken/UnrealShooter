@@ -160,18 +160,21 @@ void USHealthComponent::Heal(float HealAmount)
 
 bool USHealthComponent::IsFriendly(AActor * ActorA, AActor * ActorB)
 {
+	UE_LOG(LogClass, Log, TEXT("ActorA: %s"), *ActorA->GetName());
+	UE_LOG(LogClass, Log, TEXT("ActorB: %s"), *ActorB->GetName());
+
+	//if either actor is null assume friendly
 	if (ActorA == nullptr || ActorB == nullptr)
 	{
-		//assume friendly 
 		return true;
 	}
 
 	USHealthComponent* HealthCompA = Cast<USHealthComponent>(ActorA->GetComponentByClass(USHealthComponent::StaticClass()));
 	USHealthComponent* HealthCompB = Cast<USHealthComponent>(ActorB->GetComponentByClass(USHealthComponent::StaticClass()));
 
+	//if either health component is null assume friendly
 	if (HealthCompA == nullptr || HealthCompB == nullptr)
 	{
-		//assume friendly
 		return true;
 	}
 

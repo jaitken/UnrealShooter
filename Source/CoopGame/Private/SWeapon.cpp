@@ -4,6 +4,7 @@
 #include "SWeapon.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Particles/ParticleSystem.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -64,6 +65,7 @@ void ASWeapon::Fire()
 		AActor* MyOwner = GetOwner();
 		if (MyOwner)
 		{
+			MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 
 			FCollisionQueryParams QueryParams;
 			QueryParams.AddIgnoredActor(MyOwner);
@@ -92,6 +94,7 @@ void ASWeapon::Fire()
 			
 
 			//first line trace from camera to find impact point
+			FRotator ShootToRot;
 			FVector TraceEnd = EyeLocation + (ShotDirection * 10000);
 			FVector TracerEndPoint = TraceEnd;
 			EPhysicalSurface SurfaceType = SurfaceType_Default;
@@ -101,43 +104,23 @@ void ASWeapon::Fire()
 				//DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Blue, false, 1.0f, 0, 1.0f);
 				AActor* HitActor = Hit.GetActor();
 				TracerEndPoint = Hit.ImpactPoint;
-				DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.0f, 12, FColor::Red, false, 3, 0, 1 );
+				//DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.0f, 12, FColor::Red, false, 3, 0, 1 );
 
-				FHitResult RealHit;
-				MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
-				DrawDebugSphere(GetWorld(), MuzzleLocation, 20.0f, 12, FColor::Green, false, 3, 0, 1);
-				if (GetWorld()->LineTraceSingleByChannel(RealHit, MuzzleLocation, Hit.ImpactPoint, COLLISION_WEAPON, QueryParams))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("RealHit found"));
-					DrawDebugSphere(GetWorld(), RealHit.ImpactPoint, 20.0f, 12, FColor::Blue, false, 3, 0, 1);
-				}
+			    ShootToRot = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, Hit.ImpactPoint);
+
 			}
-
-			//second line trace from weapon to impact point
-			/*
-			FHitResult Hit1;
-			MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
-			if (GetWorld()->LineTraceSingleByChannel(Hit1, MuzzleLocation, TracerEndPoint, COLLISION_WEAPON, QueryParams))
+			else
 			{
-				//DrawDebugLine(GetWorld(), MuzzleLocation, TracerEndPoint, FColor::Red, false, 3.0f, 0, 1.0f);
-				//Blocking hit, process damage
-				AActor* HitActor = Hit1.GetActor();
-				DrawDebugSphere(GetWorld(), Hit1.ImpactPoint, 20.0f, 12, FColor::Blue, false, 3, 0, 1);
-
-				//determine surface type
-				SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit1.PhysMaterial.Get());
-
-				float ActualDamage = BaseDamage;
-				if (SurfaceType == SURFACE_FLESHVULNERABLE)
-				{
-					ActualDamage *= 4.0f;
-				}
-
-				UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit1, MyOwner->GetInstigatorController(), MyOwner, DamageType);
-				PlayImpactEffects(SurfaceType, Hit1.ImpactPoint);
-				TracerEndPoint = Hit1.ImpactPoint;
+				ShootToRot = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, TraceEnd);
 			}
-			*/
+
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			AActor* Bullet = GetWorld()->SpawnActor<AActor>(ProjectileClass, MuzzleLocation, ShootToRot, SpawnParams);
+			if (Bullet) {
+				Bullet->SetOwner(this);
+			}
+
 			PlayFireEffects(TracerEndPoint);
 
 			LastFireTime = GetWorld()->TimeSeconds;
