@@ -9,6 +9,8 @@
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
+#include "SWeapon.h"
+#include "Math/Vector.h"
 
 // Sets default values
 ASNormalBullet::ASNormalBullet()
@@ -28,7 +30,7 @@ ASNormalBullet::ASNormalBullet()
 void ASNormalBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	SetLifeSpan(5.0f);
+	SetLifeSpan(2.0f);
 	
 }
 
@@ -39,43 +41,74 @@ void ASNormalBullet::Tick(float DeltaTime)
 
 }
 
-void ASNormalBullet::NotifyActorBeginOverlap(AActor * OtherActor)
+
+void ASNormalBullet::NotifyHit(class UPrimitiveComponent * MyComp, AActor * Other, class UPrimitiveComponent * OtherComp, bool bSelfMoved,
+	                            FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult & Hit)
 {
-	//if actor has already been damaged by this bullet ignore
-	if (OtherActor == LastDamagedActor) {
-		return;
-	}
-	LastDamagedActor = OtherActor;
+	FVector Forward = GetActorForwardVector();
+	Forward = Forward * TraceAfterDistance;
+
+	UE_LOG(LogTemp, Log, TEXT("Hit Called"));
+	//DrawDebugSphere(GetWorld(), HitLocation, 5.0f, 12, FColor::Red, false, 3, 0, 1);
 
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
 	QueryParams.bTraceComplex = true;
 	QueryParams.bReturnPhysicalMaterial = true;
 
-	FVector Forward = GetActorForwardVector();
-	Forward = Forward * 500;
-
-	FHitResult Hit;
+	FHitResult BulletHit;
 	EPhysicalSurface SurfaceType = SurfaceType_Default;
-	if (GetWorld()->LineTraceSingleByChannel(Hit, GetActorLocation()-Forward, GetActorLocation(), COLLISION_WEAPON, QueryParams))
+	if (GetWorld()->LineTraceSingleByChannel(BulletHit, HitLocation, HitLocation + Forward, COLLISION_WEAPON, QueryParams))
 	{
-		DrawDebugLine(GetWorld(), GetActorLocation()-Forward, GetActorLocation(), FColor::Red, false, 5.0f, 0, 1.0f);
+		//DrawDebugLine(GetWorld(), HitLocation, HitLocation + Forward, FColor::Red, false, 5.0f, 0, 1.0f);
 
-		SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
+
+		SurfaceType = UPhysicalMaterial::DetermineSurfaceType(BulletHit.PhysMaterial.Get());
 
 		float damage = 20;
 		if (SurfaceType == SURFACE_FLESHVULNERABLE)
 		{
-			UE_LOG(LogTemp, Log, TEXT("HeadShot"));
+			//UE_LOG(LogTemp, Log, TEXT("HeadShot"));
 			damage = 40;
 		}
-		else
-			UE_LOG(LogTemp, Log, TEXT("NormalShot"));
+		else {
+			//UE_LOG(LogTemp, Log, TEXT("NormalShot"));
+		}
 
 		AActor* HitActor = Hit.GetActor();
 
-		UGameplayStatics::ApplyPointDamage(HitActor, damage, GetActorLocation() + Forward, Hit, this->GetInstigatorController(), this->GetOwner()->GetOwner(), DamageType);
+		UGameplayStatics::ApplyPointDamage(HitActor, damage, Forward, Hit, this->GetInstigatorController(), this->GetOwner()->GetOwner(), DamageType);
+		PlayImpactEffects(SurfaceType, HitLocation, Forward);
+		Destroy();
 
 	}
-	
+}
+
+void ASNormalBullet::PlayImpactEffects(EPhysicalSurface SurfaceType, FVector ImpactPoint, FVector ShotDirection)
+{
+	UParticleSystem* SelectedEffect = nullptr;
+
+	//switch to determine which surface effect to use
+	switch (SurfaceType)
+	{
+	case SURFACE_FLESHDEFAULT:
+	case SURFACE_FLESHVULNERABLE:
+		SelectedEffect = FleshImpactEffect;
+		break;
+
+	default:
+		SelectedEffect = DefaultImpactEffect;
+		break;
+	}
+
+	//apply surface effect
+	if (SelectedEffect)
+	{
+		//FVector ShotDirection = ImpactPoint - MuzzleLocation;
+		ShotDirection.Normalize();
+
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SelectedEffect, ImpactPoint, ShotDirection.Rotation());
+
+	}
+
 }

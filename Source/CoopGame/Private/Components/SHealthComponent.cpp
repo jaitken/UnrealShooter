@@ -69,7 +69,7 @@ void USHealthComponent::HandleTakeAnyDamage(AActor * DamagedActor, float Damage,
 {
 	if (Damage < 0.0f || bIsDead)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Target is already Dead"));
+		//UE_LOG(LogTemp, Log, TEXT("Target is already Dead"));
 		return;
 	}
 
@@ -80,12 +80,12 @@ void USHealthComponent::HandleTakeAnyDamage(AActor * DamagedActor, float Damage,
 	{
 		if ((DamageCauser != DamagedActor) && IsFriendly(DamagedActor, DamageCauser))
 		{
-			UE_LOG(LogTemp, Log, TEXT("Damage Ignored"));
+			//UE_LOG(LogTemp, Log, TEXT("Damage Ignored"));
 			return;
 		}
 	}
 	
-	UE_LOG(LogTemp, Log, TEXT("Health: %s"), *FString::SanitizeFloat(Health));
+	//UE_LOG(LogTemp, Log, TEXT("Health: %s"), *FString::SanitizeFloat(Health));
 	//apply damage while clamping health to 0/default health
 	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
 	//Health = Health - Damage;
@@ -93,8 +93,8 @@ void USHealthComponent::HandleTakeAnyDamage(AActor * DamagedActor, float Damage,
 	DamagedRecently = true;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Damage, this, &USHealthComponent::ResetDamagedRecently, 3.0f, false);
 	
-	UE_LOG(LogTemp, Log, TEXT("Damage: %f"), Damage);
-	UE_LOG(LogTemp, Log, TEXT("Health Changed: %s"), *FString::SanitizeFloat(Health));
+	//UE_LOG(LogTemp, Log, TEXT("Damage: %f"), Damage);
+	//UE_LOG(LogTemp, Log, TEXT("Health Changed: %s"), *FString::SanitizeFloat(Health));
 
 	//if target is dead mark the IsDead bool
 	bIsDead = Health <= 0.0f;
@@ -125,7 +125,7 @@ void USHealthComponent::HealSelf()
 	
 	if (!DamagedRecently && !bIsDead && !(Health > DefaultHealth))
 	{
-		UE_LOG(LogTemp, Log, TEXT("SelfHeal Active"));
+		//UE_LOG(LogTemp, Log, TEXT("SelfHeal Active"));
 		Health += 1;
 	}
 }
@@ -150,7 +150,7 @@ void USHealthComponent::Heal(float HealAmount)
 
 	Health = FMath::Clamp(Health + HealAmount, 0.0f, DefaultHealth);
 
-	UE_LOG(LogTemp, Log, TEXT("Health Changed: %s (+%s)"), *FString::SanitizeFloat(Health), *FString::SanitizeFloat(HealAmount));
+	//UE_LOG(LogTemp, Log, TEXT("Health Changed: %s (+%s)"), *FString::SanitizeFloat(Health), *FString::SanitizeFloat(HealAmount));
 
 	OnHealthChanged.Broadcast(this, Health, -HealAmount, nullptr, nullptr, nullptr);
 

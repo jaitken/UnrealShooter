@@ -57,28 +57,22 @@ void ASWeapon::Fire()
 	
 	if (CurrentAmmo > 0)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Shot Attempted"));
+		//UE_LOG(LogTemp, Log, TEXT("Shot Attempted"));
 		//Play Sound 
+		MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 		UGameplayStatics::PlaySoundAtLocation(this, ShotSound, MuzzleLocation);
 
 		//trace a line from pawn eyes to crosshair location(center screen) to find impact point, then trace a line from the gun to impact point
 		AActor* MyOwner = GetOwner();
 		if (MyOwner)
 		{
-			MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 
-			FCollisionQueryParams QueryParams;
-			QueryParams.AddIgnoredActor(MyOwner);
-			QueryParams.AddIgnoredActor(this);
-			QueryParams.bTraceComplex = true;
-			QueryParams.bReturnPhysicalMaterial = true;
-
+			//BULLET SPREAD
+			//find out how long player has been firing their weapon for bullet spread
 			FVector EyeLocation;
 			FRotator EyeRotation;
 			MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 			FVector ShotDirection = EyeRotation.Vector();
-
-			//find out how long player has been firing their weapon  for bullet spread
 			FDateTime DT = FDateTime::Now();
 			int32 CurrTimeMS = ((DT.GetHour() * 60 * 60) + (DT.GetMinute() * 60) + DT.GetSecond()) * 1000 + DT.GetMillisecond();
 			int32 ContinousFireTime = CurrTimeMS - FireStartTime;
@@ -93,7 +87,13 @@ void ASWeapon::Fire()
 			//UE_LOG(LogTemp, Warning, TEXT("Conitous Fire Time:  %d"), ContinousFireTime);
 			
 
+			//LINE TRACING
 			//first line trace from camera to find impact point
+			FCollisionQueryParams QueryParams;
+			QueryParams.AddIgnoredActor(MyOwner);
+			QueryParams.AddIgnoredActor(this);
+			QueryParams.bTraceComplex = true;
+			QueryParams.bReturnPhysicalMaterial = true;
 			FRotator ShootToRot;
 			FVector TraceEnd = EyeLocation + (ShotDirection * 10000);
 			FVector TracerEndPoint = TraceEnd;
@@ -101,11 +101,8 @@ void ASWeapon::Fire()
 			FHitResult Hit;
 			if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, COLLISION_WEAPON, QueryParams))
 			{
-				//DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Blue, false, 1.0f, 0, 1.0f);
 				AActor* HitActor = Hit.GetActor();
 				TracerEndPoint = Hit.ImpactPoint;
-				//DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.0f, 12, FColor::Red, false, 3, 0, 1 );
-
 			    ShootToRot = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, Hit.ImpactPoint);
 
 			}
@@ -114,6 +111,8 @@ void ASWeapon::Fire()
 				ShootToRot = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, TraceEnd);
 			}
 
+
+			//SPAWN BULLET PROJECTILE
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 			AActor* Bullet = GetWorld()->SpawnActor<AActor>(ProjectileClass, MuzzleLocation, ShootToRot, SpawnParams);
@@ -229,22 +228,7 @@ void ASWeapon::PlayFireEffects(FVector TracerEnd)
 
 	}
 
-
-	if (TracerEffect)
-	{
-
-		//FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
-		UParticleSystemComponent* TracerComp = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TracerEffect, MuzzleLocation);
-
-		if (TracerComp)
-		{
-			TracerComp->SetVectorParameter(TracerTargetName, TracerEnd);
-		}
-
-	}
-
 	APawn* MyOwner = Cast<APawn>(GetOwner());
-
 	if (MyOwner)
 	{
 		APlayerController* PC = Cast<APlayerController>(MyOwner->GetController());
@@ -256,33 +240,3 @@ void ASWeapon::PlayFireEffects(FVector TracerEnd)
 
 }
 
-void ASWeapon::PlayImpactEffects(EPhysicalSurface SurfaceType, FVector ImpactPoint)
-{
-
-	UParticleSystem* SelectedEffect = nullptr;
-
-	//switch to determine which surface effect to use
-	switch (SurfaceType)
-	{
-	case SURFACE_FLESHDEFAULT:
-	case SURFACE_FLESHVULNERABLE:
-		SelectedEffect = FleshImpactEffect;
-		break;
-
-	default:
-		SelectedEffect = DefaultImpactEffect;
-		break;
-	}
-
-	//apply surface effect
-	if (SelectedEffect)
-	{
-		//FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
-		FVector ShotDirection = ImpactPoint - MuzzleLocation; 
-		ShotDirection.Normalize();
-
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SelectedEffect, ImpactPoint, ShotDirection.Rotation());
-
-	}
-
-}

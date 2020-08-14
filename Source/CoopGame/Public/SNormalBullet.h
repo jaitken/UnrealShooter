@@ -8,6 +8,7 @@
 
 
 class USphereComponent;
+class ASWeapon;
 
 UCLASS()
 class COOPGAME_API ASNormalBullet : public AActor
@@ -33,12 +34,34 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	TSubclassOf<UDamageType> DamageType;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	float TraceBeforeDistance;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	float TraceAfterDistance;
+
+	AActor* Weapon;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	UParticleSystem* DefaultImpactEffect;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	UParticleSystem* FleshImpactEffect;
+
+	void PlayImpactEffects(EPhysicalSurface SurfaceType, FVector ImpactPoint, FVector ShotDirection);
 
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+	virtual void NotifyHit(class UPrimitiveComponent * MyComp,
+		AActor * Other,
+		class UPrimitiveComponent * OtherComp,
+		bool bSelfMoved,
+		FVector HitLocation,
+		FVector HitNormal,
+		FVector NormalImpulse,
+		const FHitResult & Hit) override;
 
 };

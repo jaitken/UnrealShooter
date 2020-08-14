@@ -113,7 +113,6 @@ void ASBeamRifle::Fire()
 				}
 
 				UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit1, MyOwner->GetInstigatorController(), MyOwner, DamageType);
-				PlayImpactEffects(SurfaceType, Hit1.ImpactPoint);
 				TracerEndPoint = Hit1.ImpactPoint;
 			}
 
