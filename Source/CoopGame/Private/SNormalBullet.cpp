@@ -65,11 +65,11 @@ void ASNormalBullet::NotifyHit(class UPrimitiveComponent * MyComp, AActor * Othe
 
 		SurfaceType = UPhysicalMaterial::DetermineSurfaceType(BulletHit.PhysMaterial.Get());
 
-		float damage = 20;
+		float ActualDamage = Damage;
 		if (SurfaceType == SURFACE_FLESHVULNERABLE)
 		{
 			//UE_LOG(LogTemp, Log, TEXT("HeadShot"));
-			damage = 40;
+			ActualDamage *= 4;
 		}
 		else {
 			//UE_LOG(LogTemp, Log, TEXT("NormalShot"));
@@ -77,11 +77,16 @@ void ASNormalBullet::NotifyHit(class UPrimitiveComponent * MyComp, AActor * Othe
 
 		AActor* HitActor = Hit.GetActor();
 
-		UGameplayStatics::ApplyPointDamage(HitActor, damage, Forward, Hit, this->GetInstigatorController(), this->GetOwner()->GetOwner(), DamageType);
+		UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, Forward, Hit, this->GetInstigatorController(), this->GetOwner()->GetOwner(), DamageType);
 		PlayImpactEffects(SurfaceType, HitLocation, Forward);
 		Destroy();
 
 	}
+}
+
+void ASNormalBullet::SetDamage(float NewDamage)
+{
+	Damage = NewDamage;
 }
 
 void ASNormalBullet::PlayImpactEffects(EPhysicalSurface SurfaceType, FVector ImpactPoint, FVector ShotDirection)

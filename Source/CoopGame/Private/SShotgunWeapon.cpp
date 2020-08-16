@@ -3,6 +3,7 @@
 
 #include "SShotgunWeapon.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Particles/ParticleSystem.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -13,6 +14,8 @@
 #include "DrawDebugHelpers.h"
 #include "Sound/SoundCue.h"
 #include "SCharacter.h"
+#include "SNormalBullet.h"
+
 
 void ASShotgunWeapon::Fire()
 {
@@ -24,24 +27,14 @@ void ASShotgunWeapon::Fire()
 		AActor* MyOwner = GetOwner();
 		if (MyOwner)
 		{
-			FCollisionQueryParams QueryParams;
-			QueryParams.AddIgnoredActor(MyOwner);
-			QueryParams.AddIgnoredActor(this);
-			QueryParams.bTraceComplex = true;
-			QueryParams.bReturnPhysicalMaterial = true;
 
 			FVector EyeLocation;
 			FRotator EyeRotation;
-
 			MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
-
 			FVector ShotDirection = EyeRotation.Vector();
 
 			//offset Eyelocation so the line trace starts more in line with muzzlelocation
-			EyeLocation = EyeLocation + (ShotDirection * 175);
-
 			float Yaw = EyeRotation.Yaw;
-
 			for (int i = 0; i < PelletCount; i++)
 			{
 				//switch statment/offset vector to give a nice even bullet spread
@@ -84,7 +77,6 @@ void ASShotgunWeapon::Fire()
 						break;
 
 					}
-
 				}
 				else
 				{
@@ -124,41 +116,49 @@ void ASShotgunWeapon::Fire()
 						break;
 
 					}
-
 				}
 				
 
-				FVector TraceEnd = EyeLocation + (ShotDirection * 4000);
+				//LINE TRACING
+				//first line trace from camera to find impact point
+				MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+				FCollisionQueryParams QueryParams;
+				QueryParams.AddIgnoredActor(MyOwner);
+				QueryParams.AddIgnoredActor(this);
+				QueryParams.bTraceComplex = true;
+				QueryParams.bReturnPhysicalMaterial = true;
+				FRotator ShootToRot;
+				FVector TraceEnd = EyeLocation + (ShotDirection * 10000);
 				TraceEnd = TraceEnd + offset;
 				FVector TracerEndPoint = TraceEnd;
 				EPhysicalSurface SurfaceType = SurfaceType_Default;
 				FHitResult Hit;
 				if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, COLLISION_WEAPON, QueryParams))
 				{
-
-					//Blocking hit, process damage
 					AActor* HitActor = Hit.GetActor();
-
-					//determine surface type
-					SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
-
-					float ActualDamage = BaseDamage;
-					if (SurfaceType == SURFACE_FLESHVULNERABLE)
-					{
-						ActualDamage *= 4.0f;
-					}
-
-					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
-
-
 					TracerEndPoint = Hit.ImpactPoint;
+					ShootToRot = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, Hit.ImpactPoint);
+				}
+				else
+				{
+					ShootToRot = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, TraceEnd);
 				}
 
-				//Play FX
-				PlayFireEffects(TracerEndPoint);
 
-				//Play Sound
-				//FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+				//SPAWN BULLET PROJECTILE
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				AActor* BulletActor = GetWorld()->SpawnActor<AActor>(ProjectileClass, MuzzleLocation, ShootToRot, SpawnParams);
+				ASNormalBullet* Bullet = Cast<ASNormalBullet>(BulletActor);
+				if (Bullet) {
+					Bullet->SetOwner(this);
+					Bullet->SetDamage(BaseDamage);
+				}
+
+
+
+				//PLAY FX AND SOUND
+				PlayFireEffects(TracerEndPoint);
 				UGameplayStatics::PlaySoundAtLocation(this, ShotSound, MuzzleLocation);
 				GetWorldTimerManager().SetTimer(TimerHandle_Pump, this, &ASShotgunWeapon::PlayPumpSound, TimeBeforePump, false);
 

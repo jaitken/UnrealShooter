@@ -13,6 +13,7 @@
 #include "TimerManager.h"
 #include "Sound/SoundCue.h"
 #include "SCharacter.h"
+#include "SNormalBullet.h"
 #include "Misc/DateTime.h"
 #include "Misc/Timespan.h"
 
@@ -57,15 +58,14 @@ void ASWeapon::Fire()
 	
 	if (CurrentAmmo > 0)
 	{
-		//UE_LOG(LogTemp, Log, TEXT("Shot Attempted"));
-		//Play Sound 
-		MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
-		UGameplayStatics::PlaySoundAtLocation(this, ShotSound, MuzzleLocation);
+		CurrentAmmo--;
+
 
 		//trace a line from pawn eyes to crosshair location(center screen) to find impact point, then trace a line from the gun to impact point
 		AActor* MyOwner = GetOwner();
 		if (MyOwner)
 		{
+
 
 			//BULLET SPREAD
 			//find out how long player has been firing their weapon for bullet spread
@@ -89,6 +89,7 @@ void ASWeapon::Fire()
 
 			//LINE TRACING
 			//first line trace from camera to find impact point
+			MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 			FCollisionQueryParams QueryParams;
 			QueryParams.AddIgnoredActor(MyOwner);
 			QueryParams.AddIgnoredActor(this);
@@ -115,30 +116,32 @@ void ASWeapon::Fire()
 			//SPAWN BULLET PROJECTILE
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			AActor* Bullet = GetWorld()->SpawnActor<AActor>(ProjectileClass, MuzzleLocation, ShootToRot, SpawnParams);
+			AActor* BulletActor = GetWorld()->SpawnActor<AActor>(ProjectileClass, MuzzleLocation, ShootToRot, SpawnParams);
+			ASNormalBullet* Bullet = Cast<ASNormalBullet>(BulletActor);
 			if (Bullet) {
 				Bullet->SetOwner(this);
+				Bullet->SetDamage(BaseDamage);
 			}
 
+			//PLAY EFFECTS AND RESET FIRE TIME
+			UGameplayStatics::PlaySoundAtLocation(this, ShotSound, MuzzleLocation);
 			PlayFireEffects(TracerEndPoint);
-
 			LastFireTime = GetWorld()->TimeSeconds;
-			CurrentAmmo--;
+
 
 			//debug fire line
 			if (DebugWeaponDrawing > 0)
 			{
-				DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::White, false, 1.0f, 0, 1.0f);
+				DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Red, false, 1.0f, 0, 1.0f);
 
 			}
-			//DrawDebugLine(GetWorld(), MuzzleLocation, TraceEnd, FColor::Red, false, 3.0f, 0, 1.0f);
 		}
 
 	}
 	else
 	{
 		//play dry fire sound and start reload
-		//FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+	    MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 		UGameplayStatics::PlaySoundAtLocation(this, DryFireSound, MuzzleLocation);
 		StartReload();
 	}

@@ -4,10 +4,12 @@
 #include "SBeamRifle.h"
 #include "SCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Sound/SoundCue.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "CoopGame/CoopGame.h"
 #include "DrawDebugHelpers.h"
+#include "SNormalBullet.h"
 
 
 void ASBeamRifle::StartReload()
@@ -62,82 +64,84 @@ void ASBeamRifle::Fire()
 
 	if (CurrentAmmo > 0)
 	{
+		CurrentAmmo--;
 
-		//trace a line from pawn eyes to crosshair location(center screen)
+
+		//trace a line from pawn eyes to crosshair location(center screen) to find impact point, then trace a line from the gun to impact point
 		AActor* MyOwner = GetOwner();
 		if (MyOwner)
 		{
-			//FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+
+
+			//BULLET SPREAD
+			//find out how long player has been firing their weapon for bullet spread
 			FVector EyeLocation;
 			FRotator EyeRotation;
 			MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 			FVector ShotDirection = EyeRotation.Vector();
-
-			//bullet spread
-			float HalfRad = FMath::DegreesToRadians(MaxBulletSpread);
+			FDateTime DT = FDateTime::Now();
+			int32 CurrTimeMS = ((DT.GetHour() * 60 * 60) + (DT.GetMinute() * 60) + DT.GetSecond()) * 1000 + DT.GetMillisecond();
+			int32 ContinousFireTime = CurrTimeMS - FireStartTime;
+			float BulletSpread = (ContinousFireTime / BulletSpreadTimer) * MaxBulletSpread;
+			BulletSpread = BulletSpread + MinBulletSpread;
+			if (BulletSpread > MaxBulletSpread)
+			{
+				BulletSpread = MaxBulletSpread;
+			}
+			float HalfRad = FMath::DegreesToRadians(BulletSpread);
 			ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
+			//UE_LOG(LogTemp, Warning, TEXT("Conitous Fire Time:  %d"), ContinousFireTime);
 
+
+			//LINE TRACING
+			//first line trace from camera to find impact point
+			MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 			FCollisionQueryParams QueryParams;
 			QueryParams.AddIgnoredActor(MyOwner);
 			QueryParams.AddIgnoredActor(this);
 			QueryParams.bTraceComplex = true;
 			QueryParams.bReturnPhysicalMaterial = true;
-
-			//first line trace from camera to find impact point
+			FRotator ShootToRot;
 			FVector TraceEnd = EyeLocation + (ShotDirection * 10000);
 			FVector TracerEndPoint = TraceEnd;
 			EPhysicalSurface SurfaceType = SurfaceType_Default;
 			FHitResult Hit;
 			if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, COLLISION_WEAPON, QueryParams))
 			{
-				//DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Blue, false, 1.0f, 0, 1.0f);
 				AActor* HitActor = Hit.GetActor();
 				TracerEndPoint = Hit.ImpactPoint;
-			}
+				ShootToRot = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, Hit.ImpactPoint);
 
-			//second line trace from weapon to impact point
-			FHitResult Hit1;
-			if (GetWorld()->LineTraceSingleByChannel(Hit1, MuzzleLocation, TracerEndPoint, COLLISION_WEAPON, QueryParams))
+			}
+			else
 			{
-				DrawDebugLine(GetWorld(), MuzzleLocation, TracerEndPoint, FColor::Red, false, 3.0f, 0, 1.0f);
-				//Blocking hit, process damage
-				AActor* HitActor = Hit1.GetActor();
-
-				//determine surface type
-				SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit1.PhysMaterial.Get());
-
-				float ActualDamage = BaseDamage;
-				if (SurfaceType == SURFACE_FLESHVULNERABLE)
-				{
-					ActualDamage *= 4.0f;
-				}
-
-				UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit1, MyOwner->GetInstigatorController(), MyOwner, DamageType);
-				TracerEndPoint = Hit1.ImpactPoint;
+				ShootToRot = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, TraceEnd);
 			}
 
 
-			PlayFireEffects(TracerEndPoint);
+			//SPAWN BULLET PROJECTILE
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			AActor* BulletActor = GetWorld()->SpawnActor<AActor>(ProjectileClass, MuzzleLocation, ShootToRot, SpawnParams);
+			ASNormalBullet* Bullet = Cast<ASNormalBullet>(BulletActor);
+			if (Bullet) {
+				Bullet->SetOwner(this);
+				Bullet->SetDamage(BaseDamage);
+			}
 
-			//Play Sound 
+
+			//PLAY EFFECTS AND RESET FIRE TIME
 			UGameplayStatics::PlaySoundAtLocation(this, ShotSound, MuzzleLocation);
 			GetWorldTimerManager().SetTimer(TimerHandle_TBetweenShots, this, &ASBeamRifle::PlayBetweenShotSound, TBetweenShots, false);
-
-
-			//DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Red, false, 3.0f, 0, 1.0f);
-
+			PlayFireEffects(TracerEndPoint);
 			LastFireTime = GetWorld()->TimeSeconds;
-			CurrentAmmo--;
-
-
-
 		}
 
 	}
 	else
 	{
 		//play dry fire sound and start reload
-		//FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+		MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 		UGameplayStatics::PlaySoundAtLocation(this, DryFireSound, MuzzleLocation);
 		StartReload();
 	}

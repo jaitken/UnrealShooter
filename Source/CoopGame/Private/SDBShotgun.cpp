@@ -3,12 +3,15 @@
 
 #include "SDBShotgun.h"
 #include "DrawDebugHelpers.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Sound/SoundCue.h"
 #include "SCharacter.h"
 #include "CoopGame/CoopGame.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
+#include "SNormalBullet.h"
+
 
 
 
@@ -17,29 +20,25 @@ void ASDBShotgun::Fire()
 
 	if (CurrentAmmo > 0)
 	{
-		//trace a line from pawn eyes to crosshair location(center screen)
+
+
 		AActor* MyOwner = GetOwner();
 		if (MyOwner)
 		{
 
-			FCollisionQueryParams QueryParams;
-			QueryParams.AddIgnoredActor(MyOwner);
-			QueryParams.AddIgnoredActor(this);
-			QueryParams.bTraceComplex = true;
-			QueryParams.bReturnPhysicalMaterial = true;
 
 			FVector EyeLocation;
 			FRotator EyeRotation;
-
 			MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
-
 			FVector ShotDirection = EyeRotation.Vector();
+			
 
 			float Yaw = EyeRotation.Yaw;
-
 			for (int i = 0; i < PelletCount; i++)
 			{
-				//switch statment/offset vector to give a nice even bullet spread
+
+
+				//switch statment/offset vector to give a even bullet spread no matter the direction the player is facing
 				FVector offset = FVector(0, 0, 0);
 				if ((Yaw >= 45 && Yaw < 135) || (Yaw >= 225 && Yaw < 315)) 
 				{
@@ -77,9 +76,7 @@ void ASDBShotgun::Fire()
 					case 9:
 						offset = FVector(150, 0, -75);
 						break;
-
 					}
-
 				}
 				else
 				{
@@ -117,40 +114,50 @@ void ASDBShotgun::Fire()
 					case 9:
 						offset = FVector(0, 150, -75);
 						break;
-
 					}
-
 				}
 
-
+				//LINE TRACING
 				//first line trace from camera to find impact point
-				FVector TraceEnd = EyeLocation + (ShotDirection * 4000);
+				MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+				FCollisionQueryParams QueryParams;
+				QueryParams.AddIgnoredActor(MyOwner);
+				QueryParams.AddIgnoredActor(this);
+				QueryParams.bTraceComplex = true;
+				QueryParams.bReturnPhysicalMaterial = true;
+				FRotator ShootToRot;
+				FVector TraceEnd = EyeLocation + (ShotDirection * 10000);
 				TraceEnd = TraceEnd + offset;
-				FVector TracerEndPoint;
+				FVector TracerEndPoint = TraceEnd;
 				EPhysicalSurface SurfaceType = SurfaceType_Default;
 				FHitResult Hit;
 				if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, COLLISION_WEAPON, QueryParams))
 				{
-					//DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Blue, false, 10.0f, 0, 1.0f);
 					AActor* HitActor = Hit.GetActor();
 					TracerEndPoint = Hit.ImpactPoint;
-					//DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 2.0f, 12, FColor::Blue, false, 1.0f, 0, 1.0f);
-
-					float ActualDamage = BaseDamage;
-					if (SurfaceType == SURFACE_FLESHVULNERABLE)
-					{
-						ActualDamage *= 4.0f;
-					}
-
-					UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
-
+					ShootToRot = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, Hit.ImpactPoint);
+				}
+				else
+				{
+					ShootToRot = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, TraceEnd);
 				}
 
-				//Play FX
-				PlayFireEffects(TracerEndPoint);
 
-				//Play Sound
+				//SPAWN BULLET PROJECTILE
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				AActor* BulletActor = GetWorld()->SpawnActor<AActor>(ProjectileClass, MuzzleLocation, ShootToRot, SpawnParams);
+				ASNormalBullet* Bullet = Cast<ASNormalBullet>(BulletActor);
+				if (Bullet) {
+					Bullet->SetOwner(this);
+					Bullet->SetDamage(BaseDamage);
+				}
+
+
+				//PLAY FX AND SET LAST FIRE TIME
+				PlayFireEffects(TracerEndPoint);
 				UGameplayStatics::PlaySoundAtLocation(this, ShotSound, MuzzleLocation);
+				LastFireTime = GetWorld()->TimeSeconds;
 
 
 				//DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Red, false, 10.0f, 0, 2.0f);
