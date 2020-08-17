@@ -80,7 +80,7 @@ void USHealthComponent::HandleTakeAnyDamage(AActor * DamagedActor, float Damage,
 	{
 		if ((DamageCauser != DamagedActor) && IsFriendly(DamagedActor, DamageCauser))
 		{
-			//UE_LOG(LogTemp, Log, TEXT("Damage Ignored"));
+			UE_LOG(LogTemp, Log, TEXT("Damage Ignored"));
 			return;
 		}
 	}

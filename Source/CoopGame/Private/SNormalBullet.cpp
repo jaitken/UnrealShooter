@@ -78,10 +78,10 @@ void ASNormalBullet::NotifyHit(class UPrimitiveComponent * MyComp, AActor * Othe
 		AActor* HitActor = Hit.GetActor();
 
 		UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, Forward, Hit, this->GetInstigatorController(), this->GetOwner()->GetOwner(), DamageType);
-		PlayImpactEffects(SurfaceType, HitLocation, Forward);
-		Destroy();
 
 	}
+	PlayImpactEffects(SurfaceType, HitLocation, Forward);
+	Destroy();
 }
 
 void ASNormalBullet::SetDamage(float NewDamage)
