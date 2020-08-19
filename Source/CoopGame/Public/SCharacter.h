@@ -78,6 +78,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	ASWeapon* Weapon3;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	ASWeapon* Weapon4;
+
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<ASWeapon> StarterWeaponClass;
@@ -87,6 +90,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<ASWeapon> StarterWeaponClass3;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<ASWeapon> StarterWeaponClass4;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
 	FName WeaponAttachSocketName;
@@ -109,6 +115,8 @@ protected:
 	void SwitchToWeapon2();
 
 	void SwitchToWeapon3();
+
+	void SwitchToWeapon4();
 
 	void PickUpWeapon();
 

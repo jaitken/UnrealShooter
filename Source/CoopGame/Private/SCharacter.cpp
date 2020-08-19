@@ -82,6 +82,13 @@ void ASCharacter::BeginPlay()
 			Weapon3->SetOwner(this);
 			Weapon3->SetActorHiddenInGame(true);
 		}
+
+		Weapon4 = GetWorld()->SpawnActor<ASWeapon>(StarterWeaponClass4, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		if (Weapon3)
+		{
+			Weapon4->SetOwner(this);
+			Weapon4->SetActorHiddenInGame(true);
+		}
 		
 
 		CurrentWeapon = Weapon1;
@@ -293,6 +300,19 @@ void ASCharacter::SwitchToWeapon3()
 	CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
 }
 
+void ASCharacter::SwitchToWeapon4()
+{
+	//do nothing if weapon4 is out
+	if (CurrentWeapon == Weapon4)
+	{
+		return;
+	}
+	CurrentWeapon->SetActorHiddenInGame(true);
+	CurrentWeapon = Weapon4;
+	CurrentWeapon->SetActorHiddenInGame(false);
+	CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
+}
+
 void ASCharacter::PickUpWeapon()
 {
 	if (bPlayerOverWeapon) {
@@ -375,6 +395,7 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("SwitchToWeapon1", IE_Pressed, this, &ASCharacter::SwitchToWeapon1);
 	PlayerInputComponent->BindAction("SwitchToWeapon2", IE_Pressed, this, &ASCharacter::SwitchToWeapon2);
 	PlayerInputComponent->BindAction("SwitchToWeapon3", IE_Pressed, this, &ASCharacter::SwitchToWeapon3);
+	PlayerInputComponent->BindAction("SwitchToWeapon4", IE_Pressed, this, &ASCharacter::SwitchToWeapon4);
 
 	PlayerInputComponent->BindAction("BuyDoor", IE_Pressed, this, &ASCharacter::BuyDoor);
 
