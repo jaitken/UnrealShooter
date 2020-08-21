@@ -33,28 +33,9 @@ public:
 	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
 	TArray<AActor*> SpawnPoints;
 
-	/*
-	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
-	AActor* SpawnPoint1;
-
-	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
-	AActor* SpawnPoint2;
-
-	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
-	AActor* SpawnPoint3;
-
-	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
-	AActor* SpawnPoint4;
-
-	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
-	AActor* SpawnPoint5;
-
-	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
-	AActor* SpawnPoint6;
-
-	UPROPERTY(EditInstanceOnly, Category = "SpawnPoints")
-	AActor* SpawnPoint7;
-	*/
+	//other doors to destroy when this door is bought
+	UPROPERTY(EditInstanceOnly, Category = "LinkedDoors")
+	TArray<AActor*> LinkedDoors;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

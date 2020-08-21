@@ -39,5 +39,10 @@ void ASWall::Open()
 		Spawn->Tags.Add(FName("ActiveSpawn"));
 	}
 
+	for (auto& Door : LinkedDoors)
+	{
+		Door->Destroy();
+	}
+
 	Destroy();
 }
