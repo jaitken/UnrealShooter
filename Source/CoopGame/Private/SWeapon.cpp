@@ -100,11 +100,13 @@ void ASWeapon::Fire()
 			FVector TracerEndPoint = TraceEnd;
 			EPhysicalSurface SurfaceType = SurfaceType_Default;
 			FHitResult Hit;
-			if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, COLLISION_WEAPON, QueryParams))
+			if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, ECC_Visibility, QueryParams))
 			{
 				AActor* HitActor = Hit.GetActor();
 				TracerEndPoint = Hit.ImpactPoint;
 			    ShootToRot = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, Hit.ImpactPoint);
+
+				//DrawDebugLine(GetWorld(), EyeLocation, Hit.ImpactPoint, FColor::Red, false, 1.0f, 0, 1.0f);
 
 			}
 			else
