@@ -110,6 +110,9 @@ protected:
 
 	FVector MuzzleLocation;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+	bool bIsPistol;
+
 public:	
 
 	void StartFire();
@@ -121,6 +124,7 @@ public:
 	virtual void FinishReload();
 
 	bool reloading;
+
 
 	int32 FireStartTime;
 
