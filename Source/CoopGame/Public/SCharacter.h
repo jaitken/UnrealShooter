@@ -12,6 +12,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class ASWeapon;
 class ASWall;
+class ASAreaDoor;
 
 UCLASS()
 class COOPGAME_API ASCharacter : public ACharacter
@@ -134,6 +135,8 @@ protected:
 	float DoorCost;
 
 	ASWall* DoorToOpen;
+
+	ASAreaDoor* AreaDoor;
 
 	//add money to character for testing
 	void AddMoney();

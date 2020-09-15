@@ -10,6 +10,7 @@
 #include "SWeaponPickup.h"
 #include "SBeamRifle.h"
 #include "SWall.h"
+#include "SAreaDoor.h"
 #include "AmmoPickup.h"
 #include "SDBShotgun.h"
 #include "Misc/DateTime.h"
@@ -330,6 +331,7 @@ void ASCharacter::PickUpWeapon()
 
 void ASCharacter::BuyDoor()
 {
+	/*/
 	//UE_LOG(LogTemp, Warning, TEXT("BUY Door Attempted"))
 	if (bPlayerNearDoor)
 	{
@@ -341,6 +343,9 @@ void ASCharacter::BuyDoor()
 				DoorToOpen->Open();
 			}
 	}
+	*/
+
+	AreaDoor->Open();
 
 }
 
@@ -497,6 +502,15 @@ void ASCharacter::NotifyActorBeginOverlap(AActor * OtherActor)
 		DoorToOpen = Wall;
 
 	}
+
+	//area doors
+	ASAreaDoor* Temp = Cast<ASAreaDoor>(OtherActor);
+	if (Temp)
+	{
+		AreaDoor = Temp;
+	}
+	
+
 
 }
 
